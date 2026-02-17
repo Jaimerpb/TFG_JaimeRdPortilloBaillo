@@ -1,0 +1,32 @@
+\documentclass[a4paper,12pt]{article}
+  
+% Paquetes fundamentales para tu TFG
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}  % Matemáticas avanzadas
+\usepackage{amssymb}  % Símbolos (R, C, etc.)
+\usepackage{physics}  % Derivadas fáciles (\dd{x}{t})
+
+\title{Prueba de Entorno: TFG Física Aceleradores}
+\author{Jaime}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+Si estás leyendo esto en el PDF de la derecha, \textbf{tu entorno funciona perfectamente}.
+
+\section{Ecuación de Hill}
+El objetivo del TFG es extender la ecuación lineal:
+\begin{equation}
+    \dv[2]{x}{s} + K(s)x(s) = 0
+\end{equation}
+
+A su versión no lineal con términos de perturbación:
+\begin{equation}
+    x'' + K(s)x + \underbrace{\frac{1}{2!}m x^2}_{\text{Sextupolo}} + \dots = 0
+\end{equation}
+
+\end{document}
