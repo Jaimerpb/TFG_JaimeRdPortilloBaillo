@@ -52,7 +52,7 @@ def k(s):
 
 # se invocan los 'modelos'
 modelo1 = onlyquads(k_func = k)
-modelo2 = 
+
 # sols rk de los modelos
 y1 = rk4(modelo1, y0, s_vector, ds)
 

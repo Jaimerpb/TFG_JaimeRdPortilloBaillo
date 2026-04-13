@@ -46,6 +46,17 @@ class hills_off():
     
     def __call__(self, s, y):
         x,v = y 
+
+        rhoinv = 1 / (self.rho_func(s) **2)
+        inhomterm = self.delta / self.rho_func(s)
+
+        Vprima= -(rhoinv + self.k_func) *x + inhomterm
+        return np.array( [v, Vprima])
+
+
+
+
+
         
 
 
