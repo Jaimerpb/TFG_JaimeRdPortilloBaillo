@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # Del módulo hills importamso las EDOS
 
-from edos import 
+from hills import onlyquads
 
 
 
@@ -43,5 +43,10 @@ ds= 1 #milímetros
 s_end= 1000 #milímetros
 s_vector = np.linspace(0,s_end,1001)
 
+#definimos la función k(s)
+def k(s):
+    return s
 
+modelo = onlyquads(k_func = k)
 
+y = rk4(modelo, y0, s_vector, ds)
