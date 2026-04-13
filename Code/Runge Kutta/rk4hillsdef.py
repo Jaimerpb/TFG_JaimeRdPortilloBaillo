@@ -83,7 +83,7 @@ plt.show()
 
 
 plt.figure(figsize=(6, 6))
-plt.plot(y3[0,:], y3[1, :]) # representamos pos vs vel
+plt.plot(y4[0,:], y4[1, :]) # representamos pos vs vel
 plt.title("Diagrama de Fases de Hills")
 plt.xlabel("Posición (x)")
 plt.ylabel("Velocidad (v)")
@@ -138,7 +138,7 @@ plt.plot(h_step_values, desv, marker='o', color='purple',linewidth = 2)
 plt.gca().invert_xaxis() #invierte el ejex para que la gráfica avanze a medida qye h decrec3
 
 plt.xscale('log', base =2 )
-plt.yscale('log', base=2 )
+plt.yscale('log', base=12 )
 
 plt.title("Convergenicia rk4")
 plt.xlabel("tamaño del paso $h$ (mm)")

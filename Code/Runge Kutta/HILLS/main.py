@@ -27,12 +27,12 @@ def rk4 (modeloEDO, y0, s_vector, ds):
         k4 = modeloEDO (s_i + ds, estado_act + ds*k3)
 
         # Estado siguiente
-        y[:, i+1] = estado_act + (1/6*ds)*(k1 +2*k2 + 2*k3+ k4)
+        y[:, i+1] = estado_act + (1/6*ds) *(k1 +2*k2 + 2*k3+ k4)
 
     return y 
 
 
-
+# Parámetros y funciones
 
 #Cond. iniciales
 x0 = 1 # pos incial Xo
@@ -45,8 +45,24 @@ s_vector = np.linspace(0,s_end,1001)
 
 #definimos la función k(s)
 def k(s):
-    return s
+    return np.cos(s)
 
-modelo = onlyquads(k_func = k)
+# def rho(s):
+#     return ??
 
-y = rk4(modelo, y0, s_vector, ds)
+# se invocan los 'modelos'
+modelo1 = onlyquads(k_func = k)
+modelo2 = 
+# sols rk de los modelos
+y1 = rk4(modelo1, y0, s_vector, ds)
+
+
+# Diagrama de fFASES
+
+plt.figure(figsize=(6, 6))
+plt.plot(y1[0,:], y1[1, :]) # representamos pos vs vel
+plt.title("Diagrama de Fases de Hills")
+plt.xlabel("Posición (x)")
+plt.ylabel("Velocidad (v)")
+plt.grid(True)
+plt.show()
