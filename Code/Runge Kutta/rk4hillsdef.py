@@ -90,14 +90,14 @@ plt.ylabel("Velocidad (v)")
 plt.grid(True)
 plt.show()
 
-# # Estabilidad numérica RK
-# # Comparando respecto a iteración anterior(Desviación)
+# Esstabilidad numérica RK
+#Comparando respecto a iteración anterior(Desviación)
 h_step_values = [0.5,0.25,0.125,0.0625]
 desv = []
 
 h_anterior = 1.0
 s_vector_anterior = np.arange(0, s_end + h_anterior, h_anterior)
-k_vector_anterior = np.sqrt(3) * np.cos(np.sqrt(2) * s_vector_anterior) / 10
+k_vector_anterior = np.sqrt(3) * np.cos(np.sqrt(2) * s_vector_anterior)
     
 
 y_anterior = solvehills( y0, k_vector_anterior, h_anterior, s_end)
@@ -108,19 +108,21 @@ x_iteracion_anterior = y_anterior[0,:]
 
 for h in h_step_values:
     s_vector_actual = np.arange(0, s_end + h, h)
-    k_vector_actual = np.sqrt(3) * np.cos(np.sqrt(2) * s_vector_actual) / 10
+    k_vector_actual = np.sqrt(3) * np.cos(np.sqrt(2) * s_vector_actual)
 
     
     y_actual = solvehills( y0,k_vector_actual,h , s_end)
     x_actual = y_actual[0,:]
     
     #nos quedamos con los nodos pares para poder calcular luego las desviaciones
-    #con esto se resuelve la resta de vectores de distinto tamaño
-    x_actual_comparable = x_actual[::2]
+    # se resulve con esto la resta de vectores de distinto tamaño
+    x_actualsamesize= x_actual[:: 2] # Otra opciión es np.,interp(svectoractual, svectoranterior, x_actual )
+    
 
 
     #Desviación relativa(es la distancia euclidea normalziada)
-    error_absoluto = np.linalg.norm(x_actual_comparable - x_iteracion_anterior)
+    
+    error_absoluto = np.linalg.norm(x_actualsamesize - x_iteracion_anterior)
     desv_rela= error_absoluto/ np.linalg.norm( x_iteracion_anterior )
     
     desv.append(desv_rela)
@@ -135,8 +137,8 @@ plt.plot(h_step_values, desv, marker='o', color='purple',linewidth = 2)
 
 plt.gca().invert_xaxis() #invierte el ejex para que la gráfica avanze a medida qye h decrec3
 
-plt.xscale('log', base = 2 )
-plt.yscale('log', base= 10 )
+plt.xscale('log', base =2 )
+plt.yscale('log', base=2 )
 
 plt.title("Convergenicia rk4")
 plt.xlabel("tamaño del paso $h$ (mm)")
