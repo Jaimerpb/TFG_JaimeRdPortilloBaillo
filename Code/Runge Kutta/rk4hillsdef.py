@@ -6,14 +6,14 @@ x0 = 1 # pos inicial
 dxds = 0 # ángulo/vel inicial 
 y0 = np.array([x0,dxds]) # estado inicial del sistema 
 
-ds = 1 # milímetros 
-s_end = 1000 # milímetrss 
-s_vector = np.linspace(0,s_end, 1001)
+ds = .1 # milímetros 
+s_end = 100 # milímetrss 
+s_vector = np.arange(0,s_end+ds, ds)
 
-# Para distintas func k(s=) creamos los vectores evaluados en s (?s_Vector')
+# Para distintas func k(s) creamos los vectores evaluados en s (?s_Vector')
 kvector1 = s_vector # Es el caso k(s) = s
 kvector2 = np.cos(s_vector) # Es j(S)= cos(s)
-kvector3 = np.sqrt(3)* np.cos(np.sqrt(2)* s_vector) #k(s)= r(3)*cos(r(2)*s)
+kvector3 = np.sqrt(3)* np.cos(np.sqrt(2)/100* s_vector)/100 #k(s)= r(3)*cos(r(2)*s)
 
 # Resolviendo hills con rk4
 
@@ -68,12 +68,12 @@ def solvehills(y0,k_vector,ds,s_end):
 #se llama a la función solvehills
 y1 = solvehills(y0,kvector1,ds,s_end)
 y2 = solvehills(y0,kvector2,ds,s_end)
-y3 = solvehills(y0,kvector3/10,ds,s_end)
+y3 = solvehills(y0,kvector3,ds,s_end)
 y4 = solvehills(y0, kvector3*0 + .1 ,ds,s_end)
 
 plt.figure(figsize=(8, 4))
-plt.plot(s_vector, y4[0, :], label='Posición (x)')
-plt.plot(s_vector, y4[1, :], label='Velocidad (v)')
+plt.plot(s_vector, y3[0, :], label='Posición (x)')
+plt.plot(s_vector, y3[1, :], label='Velocidad (v)')
 plt.title("Hills eq usando RK4")
 plt.xlabel("Tiempo (t)")
 plt.ylabel("Amplitud")
@@ -83,7 +83,7 @@ plt.show()
 
 
 plt.figure(figsize=(6, 6))
-plt.plot(y4[0,:], y4[1, :]) # representamos pos vs vel
+plt.plot(y3[0,:], y3[1, :]) # representamos pos vs vel
 plt.title("Diagrama de Fases de Hills")
 plt.xlabel("Posición (x)")
 plt.ylabel("Velocidad (v)")
@@ -92,12 +92,14 @@ plt.show()
 
 # Esstabilidad numérica RK
 #Comparando respecto a iteración anterior(Desviación)
-h_step_values = [0.5,0.25,0.125,0.0625]
+h_step_values = ds / np.array([1,2,4,8,16])
 desv = []
 
-h_anterior = 1.0
+h_anterior = 2*ds
 s_vector_anterior = np.arange(0, s_end + h_anterior, h_anterior)
-k_vector_anterior = np.sqrt(3) * np.cos(np.sqrt(2) * s_vector_anterior)
+k_vector_anterior = np.sqrt(3) * np.cos(np.sqrt(2)/100 * s_vector_anterior)/100
+
+# kvector3 = np.sqrt(3)* np.cos(np.sqrt(2)/100* s_vector)/100 #k(s)= r(3)*cos(r(2)*s)
     
 
 y_anterior = solvehills( y0, k_vector_anterior, h_anterior, s_end)
@@ -108,7 +110,7 @@ x_iteracion_anterior = y_anterior[0,:]
 
 for h in h_step_values:
     s_vector_actual = np.arange(0, s_end + h, h)
-    k_vector_actual = np.sqrt(3) * np.cos(np.sqrt(2) * s_vector_actual)
+    k_vector_actual = np.sqrt(3) * np.cos(np.sqrt(2)/100 * s_vector_actual)/100
 
     
     y_actual = solvehills( y0,k_vector_actual,h , s_end)
@@ -128,7 +130,7 @@ for h in h_step_values:
     desv.append(desv_rela)
 
     x_iteracion_anterior = x_actual
-
+print(desv)
 # wE visualiza el error
 
 plt.figure(figsize=(8,4))
@@ -137,8 +139,8 @@ plt.plot(h_step_values, desv, marker='o', color='purple',linewidth = 2)
 
 plt.gca().invert_xaxis() #invierte el ejex para que la gráfica avanze a medida qye h decrec3
 
-plt.xscale('log', base =2 )
-plt.yscale('log', base=12 )
+
+plt.yscale('log', base= 10)
 
 plt.title("Convergenicia rk4")
 plt.xlabel("tamaño del paso $h$ (mm)")
