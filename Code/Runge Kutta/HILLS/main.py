@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # Del módulo hills importamso las EDOS
 
-from hills import onlyquads
+from hills import hills_lineal_hom
 
 
 
@@ -23,7 +23,7 @@ def rk4 (modeloEDO, y0, s_vector, ds):
         # estructura rk4, evaluando directamente con el modelo f(s,y) q le pasemos
         k1 = modeloEDO (s_i, estado_act)
         k2 = modeloEDO(s_i + 0.5*ds , estado_act + 0.5*ds*k1)
-        k3= modeloEDO(s_i + 0.5*ds, estado_act + 0.5*ds*k2 )
+        k3 = modeloEDO(s_i + 0.5*ds, estado_act + 0.5*ds*k2 )
         k4 = modeloEDO (s_i + ds, estado_act + ds*k3)
 
         # Estado siguiente
@@ -35,67 +35,85 @@ def rk4 (modeloEDO, y0, s_vector, ds):
 # Parámetros
 
 #Cond. iniciales
-x0 = 1 # pos incial Xo
+x0 = 1e-3 # pos incial Xo
 dxds_0 = 0 #aangulo inicial X'o
-y0 = np.array([x0,dxds_0]) #estado inicial del sist
+y0 = np.array([x0,dxds_0]) # Estado inicial del sistema, con pos y ángulo iniciales
 
-ds= .1 #milímetros
+ds= 0.001 #milímetros
 s_end= 100 #milímetros
 s_vector = np.arange(0,s_end+ds, ds)
 
-k_val = 0.541
+
+
+def periodic_s(li, lf , f, s):
+    if s >= li and s <= lf:
+        return f(s)
+
+    elif s > lf:
+        s_new = s - (lf - li)
+        return periodic_s(li, lf, f, s_new)
+    elif s < li:
+        s_new = s + (lf-li)
+        return periodic_s(li, lf, f, s_new)
+
+
+ 
 
 
 
+#Slide 19
+
+k_val = 0.05     # Fuerza del gradiente magnético (1/m2)
+lq1 = 3  # Longitud del cuadrupolo (m) 
+l_i = 0  # Pos. entrada (m)
+Lc =  1 # Longitud/periodo de la celda (m) 
+
+# Slide 20
+ 
+ld = 1.5 # Longitud del dipolo (m)
+rho = 3.81 # Radio de curvatura de las partículas en la sección de los dipolos (m)
+Lc2 = 5.8 # Longitud de la celda slide20 (m)
+
+s_end= 100*Lc2 # metros
+s_vector = np.arange(0,s_end+ds, ds)
 
 
 
+def kquadb(s):
+    if s >= l_i and s <= (lq1/2):
+        return k_val
+    elif s > (lq1/ 2) and s < (Lc/2 - lq1/2):
+        return 0 
+    elif s >= (Lc/2 - lq1/2) and s <= (Lc/2 + lq1/2):
+        return -k_val
+    elif s > (Lc/2 + lq1/2) and s < (Lc - lq1/2):
+        return 0 
+    elif s >= (Lc - lq1/2) and s <= (Lc):
+        return  k_val
+    
+def kquadp(s):
+    return periodic_s(l_i, Lc, kquadb, s)
+
+def kquad(s):
+    #eN lugar de recorrer todo s_vector en cada iteración del RK4, evalúa solo el s que toque, y devuelve k evaluada en ese punto. 
+        if np.isscalar(s): 
+            return kquadp(s)
+        return np.array([kquadp(si) for si in s]) #Esto es para luego poder gráficarlo
 
 
 
-# Definimos las funciones periódica kquad, ksext (no se puede entender como funciones continuas, han de entenderse cómo lo que son, una función definida a trozos y periódica)
-# Creamos una función que devuelva cualquier función 'k' definida en el rango [li,lf]
-
-
-
-
-
-
-
-
-def kquad(s_vector):
-    return np.sqrt(3)* np.cos(np.sqrt(2)/100* s_vector)/100
-
-
-
-
-# def ksext():
-
-#     return
-
-# def rho():
-
-#     return
-
-# 𝛿 = 0.1
 
 # Se invocan los 'modelos'
-modelo1 = onlyquads(kquad_func = kquad)
-# modelo2 = quads_bending(kquad_func= kquad, rho_func = rho)
-# modelo3 = hills_off(kquad_func=kquad, rho_func= rho, delta = 𝛿)
-# modelo4 = sext_off(kquad_func = kquad, rho_func = rho,delta = 𝛿, ksext_func = ksext )
-# modelo5 = Nonhomsext_off ( kquad_func = kquad, rho_func = rho, delta = 𝛿, ksext_func = ksext)
+modelo1 = hills_lineal_hom(k_func = kquad)
+
 
     
 # solucions rk de los modelos
 y1 = rk4(modelo1, y0, s_vector, ds)
-# y2 = rk4(modelo2, y0, s_vector, ds)
-# y3 = rk4(modelo3, y0,s_vector, ds)
-# y4 = rk4(modelo4, y0, s_vector, ds)
-# y5 = rk4(modelo5, y0, s_vector, ds)
+
 
 # Diagrama de fases
-plt.figure(figsize=(6, 6))
+plt.figure(figsize=(10, 6))
 plt.plot(y1[0,:], y1[1, :]) # representamos pos vs vel
 plt.title("Diagrama de Fases de Hills")
 plt.xlabel("Posición (x)")
@@ -103,7 +121,8 @@ plt.ylabel("Velocidad (v)")
 plt.grid(True)
 plt.show()    
 
-plt.figure(figsize=(8, 4))
+
+plt.figure(figsize=(10, 4))
 plt.plot(s_vector, y1[0, :], label='Posición (x)')
 plt.plot(s_vector, y1[1, :], label='Velocidad (v)')
 plt.title("Hills eq usando RK4")
