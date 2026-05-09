@@ -12,9 +12,8 @@ class hills_lineal_hom:
     # Esto es la f(s,y) que pasamos al Rk para el ca'lculo de las pendientes
     def __call__(self, s, y):
         x, v = y
-        
-        #la x''
-        Vprima = -self.k_func(s) * x
+        # La x''
+        Vprima = -self.k_func(s)*x
         return np.array([v, Vprima])
     
 
