@@ -1,9 +1,23 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
 from pathlib import Path
+import mlflow
 # Del módulo hills importamso las EDOS
 
 from hills import hills_lineal_hom
+
+
+MLFLOW_TRACKING_DIR = Path(__file__).with_name("mlruns").resolve()
+PLOTS_DIR = Path(__file__).with_name("plots")
+mlflow.set_tracking_uri(MLFLOW_TRACKING_DIR.as_uri())
+mlflow.set_experiment("HILLS")
+
+
+def log_figure(fig, filename):
+    PLOTS_DIR.mkdir(exist_ok=True)
+    file_path = PLOTS_DIR / filename
+    fig.savefig(file_path, dpi=200, bbox_inches="tight")
+    mlflow.log_artifact(str(file_path))
 
 
 
@@ -113,9 +127,19 @@ def kquad(s):
 
 
 
-
 # Se invocan los 'modelos'
 modelo1 = hills_lineal_hom(k_func = kquad)
+
+mlflow.start_run(run_name="main.py")
+mlflow.log_params({
+    "x0": x0,
+    "dxds_0": dxds_0,
+    "k_val": k_val,
+    "lq1": lq1,
+    "Lc": Lc,
+    "ds": ds,
+    "s_end": s_end,
+})
 
 
     
@@ -168,22 +192,22 @@ print(y1)
 
 # print(desv_relativa)
 
-# plt.figure(figsize=(10, 6))
-# plt.plot(h_step_values, desv_relativa, marker='o', color='purple',  
-# linewidth=2.5, markersize=8, label='Desviación relativa')
+plt.figure(figsize=(10, 6))
+plt.plot(h_step_values, desv_relativa, marker='o', color='purple',  
+linewidth=2.5, markersize=8, label='Desviación relativa')
 
-# plt.gca().invert_xaxis() #invierte el ejex para que la gráfica avanze a medida qye h decrec3
+plt.gca().invert_xaxis() #invierte el ejex para que la gráfica avanze a medida qye h decrec3
 
 
-# plt.yscale('log', base= 10)
+plt.yscale('log', base= 10)
 
-# plt.title("Convergencia RK4: Estabilidad Numérica", fontsize=14, fontweight='bold')
-# plt.xlabel("Tamaño del paso h (mm)", fontsize=12)
-# plt.ylabel("Desviación relativa", fontsize=12)
-# plt.grid(True, which="both", ls="--", alpha=0.5)
-# plt.legend(fontsize=11)
-# plt.tight_layout()
-# plt.show()
+plt.title("Convergencia RK4: Estabilidad Numérica", fontsize=14, fontweight='bold')
+plt.xlabel("Tamaño del paso h (mm)", fontsize=12)
+plt.ylabel("Desviación relativa", fontsize=12)
+plt.grid(True, which="both", ls="--", alpha=0.5)
+plt.legend(fontsize=11)
+plt.tight_layout()
+plt.show()
 
 
 
@@ -192,7 +216,7 @@ print(y1)
 s_plot_end = 4 * Lc
 s_plot = np.arange(0, s_plot_end + ds, ds)
 k_values_4cells = kquad(s_plot)
-plt.figure(figsize=(10, 3))
+fig = plt.figure(figsize=(10, 3))
 plt.step(s_plot, k_values_4cells, where='post')
 plt.title("k(s) — 4 celdas")
 plt.xlabel("s")
@@ -200,22 +224,23 @@ plt.ylabel("k")
 plt.ylim(min(-1.5, np.min(k_values_4cells) - 0.1), max(1.5, np.max(k_values_4cells) + 0.1))
 plt.grid(True)
 plt.tight_layout()
+log_figure(fig, "k_of_s_4cells.png")
 plt.show()
 
 
 
 
-# Diagrama de fases
-# plt.figure(figsize=(10, 6))
-# plt.plot(y1[0,:], y1[1, :]) # representamos pos vs vel
-# plt.title("Diagrama de Fases de Hills")
-# plt.xlabel("Posición (x)")
-# plt.ylabel("Velocidad (v)")
-# plt.grid(True)
-# plt.show()    
+# Espacio de fases
+fig = plt.figure(figsize=(10, 6))
+plt.plot(y1[0,:], y1[1, :]) # representamos pos vs vel
+plt.title("Diagrama de Fases de Hills")
+plt.xlabel("Posición (x)")
+plt.ylabel("Velocidad (v)")
+plt.grid(True)
+plt.show()    
 
 
-plt.figure(figsize=(10, 4))
+fig = plt.figure(figsize=(10, 4))
 plt.plot(s_vector, y1[0, :], label='Posición (x)')
 plt.plot(s_vector, y1[1, :], label='Velocidad (v)')
 plt.title("Hills eq usando RK4")
@@ -223,95 +248,159 @@ plt.xlabel("Tiempo (t)")
 plt.ylabel("Amplitud")
 plt.legend()
 plt.grid(True)
+log_figure(fig, "hills_solution.png")
 plt.show()
 
 
 #Mapa de Poincaré (Simulando FODO onlyquads, slide 19, con varios Xo)
 
 
-def INDpoincare(s_vector, period):
-    # tomando la sección fija s = n*Lc, Lc es el perido.
-    #Elegimos el pto de la malla discreta(de s_vector) más cercano a cada múltiplo entero del periodod.
-    s_targets = np.arange(s_vector[0], s_vector[-1]+ 0.5*period, period) #estos son los 'ptos teóricos',se generan los pts s= n*Lx
+# def INDpoincare(s_vector, period):
+#     # tomando la sección fija s = n*Lc, Lc es el perido.
+#     #Elegimos el pto de la malla discreta(de s_vector) más cercano a cada múltiplo entero del periodod.
+#     s_targets = np.arange(s_vector[0], s_vector[-1]+ 0.5*period, period) #estos son los 'ptos teóricos',se generan los pts s= n*Lx
     
-    #searchsorted para buscar eos ptos en la malla
-    indx = np.searchsorted(s_vector, s_targets) 
-    # indx = np.clip(indx, 1,len(s_vector)- 1)
+#     #searchsorted para buscar eos ptos en la malla
+#     indx = np.searchsorted(s_vector, s_targets) 
+#     # indx = np.clip(indx, 1,len(s_vector)- 1)
     
-    #s e comparan el nodo izq y el der para elegi rel más cercano
-    ileft = indx-1 
-    iright = indx # ileft y right son dos nodos contiguos alrededor del talget
+#     #s e comparan el nodo izq y el der para elegi rel más cercano
+#     ileft = indx-1 
+#     iright = indx # ileft y right son dos nodos contiguos alrededor del talget
 
-    # para ver si el nodod derecho está más cerca que le izq
-    cond = np.abs(s_vector[iright]-s_targets)< np.abs(s_targets - s_vector[ileft])
-    #np.where(condition, [x, y, ] /) returns elements chosen from x or y depending on a condition
-    closest = np.where(cond, iright,ileft ) #son los indices en la malla que aprox cada starget
+#     # para ver si el nodod derecho está más cerca que le izq
+#     cond = np.abs(s_vector[iright]-s_targets)< np.abs(s_targets - s_vector[ileft])
+#     #np.where(condition, [x, y, ] /) returns elements chosen from x or y depending on a condition
+#     closest = np.where(cond, iright,ileft ) #son los indices en la malla que aprox cada starget
 
-    return np.unique(closest) #devuelve índice únicos, evita repetdos por redondeo
-
-
-# Ahora, función que guarda una sol. en un .txt
-
-def savesolution_block(file_handle, x0_val, dxds_0_value, s_values, y_values):
-        # columnas: 's x dxds'.
-        # data = np.column_stack() construye una matriz N x 3 con las
-        #     columnas (s,x(s),v(s)). Esa es la órbita 'continua' muestreada.
-        # np.savetxt escribe la matriz en formato numérico legible.
-        header = f"x0={x0_val:.12e}, dxds_0={dxds_0_value:.12e}"
-        file_handle.write(f"# {header}\n")
-        file_handle.write("# columns: s x dxds\n")
-        data = np.column_stack((s_values, y_values[0, :], y_values[1, :]))
-        np.savetxt(file_handle, data, fmt="%.12e")
-        file_handle.write("\n")
+#     return np.unique(closest) #devuelve índice únicos, evita repetdos por redondeo
 
 
+# # Ahora, función que guarda una sol. en un .txt
 
-def storemuchosX0(modeloEDO, x0_vals, dxds_0_value, s_values, ds_value, output_path):
+# def savesolution_block(file_handle, x0_val, dxds_0_value, s_values, y_values):
+#         # columnas: 's x dxds'.
+#         # data = np.column_stack() construye una matriz N x 3 con las
+#         #     columnas (s,x(s),v(s)). Esa es la órbita 'continua' muestreada.
+#         # np.savetxt escribe la matriz en formato numérico legible.
+#         header = f"x0={x0_val:.12e}, dxds_0={dxds_0_value:.12e}"
+#         file_handle.write(f"# {header}\n")
+#         file_handle.write("# columns: s x dxds\n")
+#         data = np.column_stack((s_values, y_values[0, :], y_values[1, :]))
+#         np.savetxt(file_handle, data, fmt="%.12e")
+#         file_handle.write("\n")
 
-    #guardan los ptso disc. que van a formar el mapa (x, v) y su etiqeta
-    poincarex= []
-    poincarev = []
-    poincare_labels = []
 
-    #abrimso el fichero,en modod escritura, y guardamos cada óribita compeplta(llamando a la función savesolution_block o)
-    with open(output_path, "w", encoding="utf-8") as file_handle:
-                for x0_val in x0_vals:
+
+# def storemuchosX0(modeloEDO, x0_vals, dxds_0_value, s_values, ds_value, output_path):
+
+#     #guardan los ptso disc. que van a formar el mapa (x, v) y su etiqeta
+#     poincarex= []
+#     poincarev = []
+#     poincare_labels = []
+
+#     #abrimso el fichero,en modod escritura, y guardamos cada óribita compeplta(llamando a la función savesolution_block o)
+#     with open(output_path, "w", encoding="utf-8") as file_handle:
+#                 for x0_val in x0_vals:
                         
-                        y0_value = np.array([x0_val, dxds_0_value], dtype=float) # cocndiciones inic.
-                        y_values = rk4(modeloEDO, y0_value, s_values, ds_value) #resuelve 
-                        savesolution_block(file_handle, x0_val, dxds_0_value, s_values, y_values) #guarda la órbita completa en el txt
+#                         y0_value = np.array([x0_val, dxds_0_value], dtype=float) # cocndiciones inic.
+#                         y_values = rk4(modeloEDO, y0_value, s_values, ds_value) #resuelve 
+#                         savesolution_block(file_handle, x0_val, dxds_0_value, s_values, y_values) #guarda la órbita completa en el txt
 
-                        idx = INDpoincare(s_values, Lc)# devuelve los indices de la malla que aproximan s=n*L
+#                         idx = INDpoincare(s_values, Lc)# devuelve los indices de la malla que aproximan s=n*L
                         
-                        poincarex.append(y_values[0, idx]) #estoe es x(s_n)
-                        poincarev.append(y_values[1, idx])  # y v(s_n)
-                        #esto guardad la etiqueta (Xo) para el diag.
-                        poincare_labels.append(np.full(idx.shape, x0_val))
-     # concatenamos los res. para graficaar 
-    return np.concatenate(poincarex),np.concatenate(poincarev) , np.concatenate(poincare_labels)
+#                         poincarex.append(y_values[0, idx]) #estoe es x(s_n)
+#                         poincarev.append(y_values[1, idx])  # y v(s_n)
+#                         #esto guardad la etiqueta (Xo) para el diag.
+#                         poincare_labels.append(np.full(idx.shape, x0_val))
+#      # concatenamos los res. para graficaar 
+#     return np.concatenate(poincarex),np.concatenate(poincarev) , np.concatenate(poincare_labels)
 
 
-x0_values = np.linspace(0.25e-3,2.0e-3 , 3)
-dxds_0= 0
+# x0_values = np.linspace(0.25e-3,2.0e-3 , 3)
+# dxds_0= 0
 
-output_path = Path(__file__).with_name("poincare_solutions.txt")
-poincare_x, poincare_v, poincare_labels = storemuchosX0(
-    modelo1,
-    x0_values,
-    dxds_0,
-    s_vector,
-    ds,
-    output_path,
-)
+# mlflow.log_param("n_x0_values", len(x0_values))
+# mlflow.log_param("x0_values", np.array2string(x0_values, precision=6, separator=","))
+
+# output_path = Path(__file__).with_name("poincare_solutions.txt")
+# poincare_x, poincare_v, poincare_labels = storemuchosX0(
+#     modelo1,
+#     x0_values,
+#     dxds_0,
+#     s_vector,
+#     ds,
+#     output_path,
+# )
+# mlflow.log_artifact(str(output_path))
+
+# results_path = PLOTS_DIR / "hills_results.npz"
+# PLOTS_DIR.mkdir(exist_ok=True)
+# np.savez_compressed(
+#     results_path,
+#     s_vector=s_vector,
+#     y1=y1,
+#     k_values_4cells=k_values_4cells,
+#     poincare_x=poincare_x,
+#     poincare_v=poincare_v,
+#     poincare_labels=poincare_labels,
+# )
+# mlflow.log_artifact(str(results_path))
+# mlflow.log_metric("poincare_points", float(len(poincare_x)))
+# mlflow.log_metric("final_position", float(y1[0, -1]))
+# mlflow.log_metric("final_velocity", float(y1[1, -1]))
 
 
-# diagram mapa poincaré 
-plt.figure(figsize=(8, 6))
-scatter = plt.scatter(poincare_x, poincare_v, c=poincare_labels, cmap="viridis", s=3, alpha=0.85)
-plt.colorbar(scatter, label="x0 inicial")
-plt.title("Mapa de Poincaré")
-plt.xlabel("x")
-plt.ylabel("dx/ds")
-plt.grid(True, alpha=0.35)
-plt.tight_layout()
+# # diagram mapa poincaré 
+# fig = plt.figure(figsize=(8, 6))
+# scatter = plt.scatter(poincare_x, poincare_v, c=poincare_labels, cmap="viridis", s=3, alpha=0.85)
+# plt.colorbar(scatter, label="x0 inicial")
+# plt.title("Mapa de Poincaré")
+# plt.xlabel("x")
+# plt.ylabel("dx/ds")
+# plt.grid(True, alpha=0.35)
+# plt.tight_layout()
+# log_figure(fig, "poincare_map.png")
+# plt.show()
+
+# mlflow.end_run()
+
+
+
+# Comparando vs sol. análitica (Thin lens approx., ver 7.3)
+
+f = 1/ ( k_val*lq1) # dsitancia focal
+L= Lc /2 # longitud entre quads
+
+# Matriz de transferencia FODO cell
+M = np.array([
+    [1 - (L**2)/(2*f**2), 2*L*  (1+ L/(2*f))],
+    [-(L/(2*f**2)) * (1 - L/(2*f)),  1- (L**2)/(2*f**2)]
+])
+
+# se iniciazlian los vectores para guardar los estados al final de cada celda
+s_discret = np.arange(0, s_end+ Lc, Lc)
+y_thin= np.zeros((2,len(s_discret)))
+y_thin[:, 0] = y0
+
+# se multiplica la matriz celda a celda 
+
+for i in range(1, len(s_discret)):
+     y_thin[:, i] = M @ y_thin[:, i-1 ]
+
+#plot comparison
+plt.figure(figsize=(12,5))
+
+#esto es la numérica, la del rk
+plt.plot(s_vector, y1[0, :], label='Numérica RK4 (Continua)', color='lightgray', linewidth=2)
+
+# Dibujamos los puntos discretos de la solución teoórics
+plt.plot(s_discret, y_thin[0, :], 'ro', markersize=4, label='Teórica Thin-Lens')
+
+plt.title("Dinámica Transversal: RK4 vs Thin Lens Approxi")
+plt.xlabel("Distancia s (m)")
+plt.ylabel(" x(s)")
+plt.xlim(0, 20* Lc)  # hacemos zoom a las primeras 20 celdas para ver bien la oscilación
+plt.legend()
+plt.grid(True)
 plt.show()
