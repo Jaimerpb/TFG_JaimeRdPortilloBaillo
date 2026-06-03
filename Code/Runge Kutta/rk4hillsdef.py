@@ -6,14 +6,15 @@ x0 = 1 # pos inicial
 dxds = 0 # ángulo/vel inicial 
 y0 = np.array([x0,dxds]) # estado inicial del sistema 
 
-ds = .1 # milímetros 
-s_end = 100 # milímetrss 
+ds = .1 # metros
+s_end = 100 # metros 
 s_vector = np.arange(0,s_end+ds, ds)
 
 # Para distintas func k(s) creamos los vectores evaluados en s (?s_Vector')
 kvector1 = s_vector # Es el caso k(s) = s
 kvector2 = np.cos(s_vector) # Es j(S)= cos(s)
 kvector3 = np.sqrt(3)* np.cos(np.sqrt(2)/100* s_vector)/100 #k(s)= r(3)*cos(r(2)*s)
+
 
 # Resolviendo hills con rk4
 
@@ -70,10 +71,11 @@ y1 = solvehills(y0,kvector1,ds,s_end)
 y2 = solvehills(y0,kvector2,ds,s_end)
 y3 = solvehills(y0,kvector3,ds,s_end)
 y4 = solvehills(y0, kvector3*0 + .1 ,ds,s_end)
+y5 = solvehills(y0, kvector4,ds, s_end )
 
 plt.figure(figsize=(8, 4))
-plt.plot(s_vector, y3[0, :], label='Posición (x)')
-plt.plot(s_vector, y3[1, :], label='Velocidad (v)')
+plt.plot(s_vector, y5[0, :], label='Posición (x)')
+plt.plot(s_vector, y5[1, :], label='Velocidad (v)')
 plt.title("Hills eq usando RK4")
 plt.xlabel("Tiempo (t)")
 plt.ylabel("Amplitud")
@@ -81,69 +83,69 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-
+#Espacio de fases
 plt.figure(figsize=(6, 6))
-plt.plot(y3[0,:], y3[1, :]) # representamos pos vs vel
+plt.plot(y5[0,:], y5[1, :]) # representamos pos vs vel
 plt.title("Diagrama de Fases de Hills")
 plt.xlabel("Posición (x)")
 plt.ylabel("Velocidad (v)")
 plt.grid(True)
 plt.show()
 
-# Esstabilidad numérica RK
-#Comparando respecto a iteración anterior(Desviación)
-h_step_values = ds / np.array([1,2,4,8,16])
-desv = []
+# # Esstabilidad numérica RK
+# #Comparando respecto a iteración anterior(Desviación)
+# h_step_values = ds / np.array([1,2,4,8,16])
+# desv = []
 
-h_anterior = 2*ds
-s_vector_anterior = np.arange(0, s_end + h_anterior, h_anterior)
-k_vector_anterior = np.sqrt(3) * np.cos(np.sqrt(2)/100 * s_vector_anterior)/100
+# h_anterior = 2*ds
+# s_vector_anterior = np.arange(0, s_end + h_anterior, h_anterior)
+# k_vector_anterior = np.sqrt(3) * np.cos(np.sqrt(2)/100 * s_vector_anterior)/100
 
-# kvector3 = np.sqrt(3)* np.cos(np.sqrt(2)/100* s_vector)/100 #k(s)= r(3)*cos(r(2)*s)
+# # kvector3 = np.sqrt(3)* np.cos(np.sqrt(2)/100* s_vector)/100 #k(s)= r(3)*cos(r(2)*s)
     
 
-y_anterior = solvehills( y0, k_vector_anterior, h_anterior, s_end)
+# y_anterior = solvehills( y0, k_vector_anterior, h_anterior, s_end)
 
-#nos quedamos con todas las columnas de la fila1(la de posiciones)
-x_iteracion_anterior = y_anterior[0,:] 
+# #nos quedamos con todas las columnas de la fila1(la de posiciones)
+# x_iteracion_anterior = y_anterior[0,:] 
 
 
-for h in h_step_values:
-    s_vector_actual = np.arange(0, s_end + h, h)
-    k_vector_actual = np.sqrt(3) * np.cos(np.sqrt(2)/100 * s_vector_actual)/100
+# for h in h_step_values:
+#     s_vector_actual = np.arange(0, s_end + h, h)
+#     k_vector_actual = np.sqrt(3) * np.cos(np.sqrt(2)/100 * s_vector_actual)/100
 
     
-    y_actual = solvehills( y0,k_vector_actual,h , s_end)
-    x_actual = y_actual[0,:]
+#     y_actual = solvehills( y0,k_vector_actual,h , s_end)
+#     x_actual = y_actual[0,:]
     
-    #nos quedamos con los nodos pares para poder calcular luego las desviaciones
-    # se resulve con esto la resta de vectores de distinto tamaño
-    x_actualsamesize= x_actual[:: 2] # Otra opciión es np.,interp(svectoractual, svectoranterior, x_actual )
+#     #nos quedamos con los nodos pares para poder calcular luego las desviaciones
+#     # se resulve con esto la resta de vectores de distinto tamaño
+#     x_actualsamesize= x_actual[:: 2] # Otra opciión es np.,interp(svectoractual, svectoranterior, x_actual )
     
 
 
-    #Desviación relativa(es la distancia euclidea normalziada)
+#     #Desviación relativa(es la distancia euclidea normalziada)
     
-    error_absoluto = np.linalg.norm(x_actualsamesize - x_iteracion_anterior)
-    desv_rela= error_absoluto/ np.linalg.norm( x_iteracion_anterior )
+#     error_absoluto = np.linalg.norm(x_actualsamesize - x_iteracion_anterior)
+#     desv_rela= error_absoluto/ np.linalg.norm( x_iteracion_anterior )
     
-    desv.append(desv_rela)
+#     desv.append(desv_rela)
 
-    x_iteracion_anterior = x_actual
-print(desv)
-# wE visualiza el error
+#     x_iteracion_anterior = x_actual
+# print(desv)
+# # wE visualiza el error
 
-plt.figure(figsize=(8,4))
-plt.plot(h_step_values, desv, marker='o', color='purple',linewidth = 2)
-
-
-plt.gca().invert_xaxis() #invierte el ejex para que la gráfica avanze a medida qye h decrec3
+# plt.figure(figsize=(8,4))
+# plt.plot(h_step_values, desv, marker='o', color='purple',linewidth = 2)
 
 
-plt.yscale('log', base= 10)
+# plt.gca().invert_xaxis() #invierte el ejex para que la gráfica avanze a medida qye h decrec3
 
-plt.title("Convergenicia rk4")
-plt.xlabel("tamaño del paso $h$ (mm)")
-plt.ylabel('desv relativa')
-plt.grid(True, which = "both", ls= "--", alpha =0.5)
-plt.show()
+
+# plt.yscale('log', base= 10)
+
+# plt.title("Convergenicia rk4")
+# plt.xlabel("tamaño del paso $h$ (mm)")
+# plt.ylabel('desv relativa')
+# plt.grid(True, which = "both", ls= "--", alpha =0.5)
+# plt.show()

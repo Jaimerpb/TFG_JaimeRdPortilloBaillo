@@ -52,22 +52,24 @@ end
 
 # Slide 19
 
-k_val = 0.459     # Fuerza del gradiente magnético (1/m2)
-lq1 = 0.2          # Longitud del cuadrupolo (m)
+k_val = 0.519     # Fuerza del gradiente magnético (1/m2)
+lq1 = 0.4         # Longitud del cuadrupolo (m)
 l_i = 0          # Pos. entrada (m)
 Lc = 1           # Longitud/periodo de la celda (m)
 
 # Slide 20
 
-ld = 1.5         # Longitud del dipolo (m)
+ld = 0.015       # Longitud del dipolo (m)
 rho = 3.81       # Radio de curvatura de las partículas en la sección de los dipolos (m)
 Lc2 = 5.8        # Longitud de la celda slide20 (m)
 
-ds = 0.01  # milímetros
+ds = 0.001  # milímetros
 
-s_end = 2000*Lc  # milímetros
-s_vector = collect(0:ds:s_end)
+s_end1 = 1000*Lc  # milímetros
+s_vector1 = collect(0:ds:s_end1)
 
+s_end2 = 700* Lc2
+s_vector2 = collect(0:ds:s_end2)
 function kquadb(s)
     if s >= l_i && s <= (lq1 / 2)
         return k_val
@@ -75,7 +77,7 @@ function kquadb(s)
         return 0
     elseif s >= (Lc / 2 - lq1 / 2) && s <= (Lc / 2 + lq1 / 2)
         return -k_val
-    elseif s > (Lc / 2 + lq1 / 2) && s < (Lc - lq1 / 2)
+    elseif s > (Lc / 2 + lq1 /2) && s < (Lc - lq1 / 2)
         return 0
     elseif s >= (Lc - lq1 / 2) && s <= Lc
         return k_val
@@ -99,6 +101,42 @@ end
 
 
 
+function k20b(s)
+    if s >= l_i && s <= (lq1 / 2)
+        return k_val
+    elseif s > (lq1 / 2) && s < (Lc2/4 - ld/2)
+        return 0
+    elseif s >= (Lc2/4 - ld/2) && s <= (Lc2/4 + ld/2)
+        return 1/rho^2
+    elseif s > (Lc2/4 + ld/2) && s < (Lc2/2 - lq1 / 2)
+        return 0
+    elseif s >= (Lc2/2 - lq1 / 2) && s <= (Lc2/2 + lq1 / 2)
+        return -k_val
+    elseif s > (Lc2/2 + lq1 / 2) && s < (3*Lc2/4 - ld/2)
+        return 0
+    elseif s >= (3*Lc2/4 - ld/2) && s <= (3*Lc2/4 + ld/2)
+        return 1/rho^2
+    elseif s > (3*Lc2/4 + ld/2) && s < (Lc2 - lq1 / 2)
+        return 0
+    elseif s >= (Lc2 - lq1 / 2) && s <= Lc2
+        return k_val
+    end
+end
+
+function k20p(s)
+    return periodic_s(l_i, Lc2, k20b, s)
+end
+
+
+function k20(s)
+    # En lugar de recorrer todo s_vector en cada iteración del RK4, 
+    # evalúa solo el s que toque, y devuelve k evaluada en ese punto.
+    if isa(s, Number)
+        return k20p(s)
+    else
+        return [k20p(si) for si in s]  # Esto es para luego poder graficarlo
+    end
+end
 
 
 
@@ -110,50 +148,49 @@ end
 
 
 
-# Se invocan los 'modelos'
+
+
+
+
+
+
+
+# Se invocan los modelos de Hills.jl, uno a uno 
 modelo1 = HillsLinealHom(k_func=kquad)
-
+# modelo2 = HillsLinealHom(k_func = k20)
 # soluciones rk de los modelos
-y1 = rk4(modelo1, y0, s_vector, ds)
+y1 = rk4(modelo1, y0, s_vector1, ds)
+# y2 = rk4(modelo2, y0, s_vector2, ds )
+
+
+
 
 # Diagrama de fases
-p1 = plot(y1[1, :], y1[2, :], xlabel="Posición (x)", ylabel="Velocidad (v)", 
-          title="Diagrama de Fases de Hills", legend=false, size=(800, 600))
+p1 = plot(y1[1, :], y1[2, :], xlabel="Posición (x)", ylabel="Ángulo (x')", 
+          title="Diagrama de Fases de Hills, slide20", legend=false, size=(800, 600))
 display(p1)
 
-# Gráfica de posición y velocidad vs tiempo
-p2 = plot(s_vector, y1[1, :], label=" 𝑥 ", xlabel=" s ", ylabel="Amplitud",
-          title="Hills eq usando RK4", size=(800, 400))
-plot!(p2, s_vector, y1[2, :], label=" 𝑥′ ")
+# Gráfica de posición y velocidad vs s
+p2 = plot(s_vector, y1[1, :], label=" x ", xlabel=" s ", ylabel="Amplitud",
+          title="Hills eq usando RK4, Accelerador slide20", size=(800, 400))
+plot!(p2, s_vector, y1[2, :], label= " x' ")
 display(p2)
 
 k_values = kquad(s_vector)
+println("Array k(s):")
+
 println("Computed k(s) over ", length(s_vector), " points.")
 
-# Animación de k(s) solo para 4 celdas, para que se aprecie bien
+
 k_plot_cells = 4
 k_s_end = k_plot_cells * Lc
 k_s_vector = collect(0:ds:k_s_end)
-k_values = kquad(k_s_vector)
+k_values = k20(k_s_vector)
 
-# Reducimos número de frames para no generar demasiados archivos intermedios
-frame_count = min(200, length(k_s_vector))
-inds = round.(Int, range(1, length(k_s_vector), length=frame_count))
-
-anim = @animate for i in inds
-    plot(k_s_vector[1:i], k_values[1:i], seriestype=:steppost,
-         ylim = (-k_val * 1.5, k_val * 1.5), xlabel="s", ylabel="k(s)",
-         title = "Función k(s) - Cuadrupolos Periódicos", legend=false,
-         linewidth=2, color=:blue)
-end
-
-# Guardar GIF
-gif(anim, "kquad_anim.gif", fps=20)
-println("Saved animation to kquad_anim.gif")
 
 
 # Gráfica de k(s)
 p3 = plot(k_s_vector, k_values, xlabel="s", ylabel="k(s)", 
-          title="Función k(s) - Cuadrupolos Periódicos", legend=false, 
+          title="Función k(s) - Regular FODO lattice", legend=false, 
           size=(1000, 400), linewidth=2, color=:blue)
 display(p3)
