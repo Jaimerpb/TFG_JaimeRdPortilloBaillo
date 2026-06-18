@@ -1,3 +1,4 @@
+
 using LinearAlgebra
 
 ## 1) Hills lineal homogénea, de la forma x'' + k(s)x = 0, con k(s) periódica.
@@ -16,5 +17,23 @@ function (hills::HillsLinealHom)(s, y)
     
     # la x''
     v_prima = -hills.k_func(s) * x
+    return [v, v_prima]
+end
+
+
+
+struct HillsLinealNonHom
+    k_func::Function
+    inhom_func::Function
+end
+
+
+HillsLinealNonHom(;k_func::Function, inhom_func::Function) = HillsLinealNonHom(k_func,inhom_func)
+
+function (hills::HillsLinealNonHom)(s, y)
+    x, v = y
+    
+    # la x''
+    v_prima = -hills.k_func(s)*x + hills.inhom_func(s)
     return [v, v_prima]
 end

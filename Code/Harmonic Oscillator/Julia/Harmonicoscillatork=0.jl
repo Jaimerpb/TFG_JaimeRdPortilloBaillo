@@ -6,7 +6,7 @@ x₂s=-5.0:0.5:5.0
 
 x₁s_phase=-5.0:1:5.0
 x₂s_phase=-5.0:1:5.0
-# Plot the vector field
+# Plotear el vector field
 fig1= plot_vector_field(x₁s, x₂s, g, scale=0.5)
 #Plotear el diagrama de fases del diagrama resultante.
 fig2=plot_phase_portrait(x₁s_phase,x₂s_phase, g, 10.0)
