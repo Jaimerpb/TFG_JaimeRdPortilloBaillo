@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from RK import rk4
 from plotting import save_figure
-# Asegúrate de tener importada tu función rk4 y save_figure donde definas esto
 
 def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titulo="Mapa de Poincaré"):
     

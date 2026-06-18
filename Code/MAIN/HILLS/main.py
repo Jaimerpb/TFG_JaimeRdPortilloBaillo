@@ -8,22 +8,23 @@ from auxiliar import kquad , k20, inhom
 from Poincaré import plot_poincare1,plot_poincareδ
 from numericalstability import numstability
 from plotting import save_figure
+from offmomentum import trayectorias
+
 
 class Parametroslattice:
     def __init__(self):
 
         # Sslide 19
         self.k_val= 0.519 # Es la fuerza de los cuadrupolos(1/m2)
-        self.lq1 = 0.4   #Longitud del cuadrupolo (m)
+        self.lq1= 0.4   #Longitud del cuadrupolo (m)
         self.l_i = 0     # Pos. entrada (m)
-        self.Lc = 1      #Longitud de la celda/periodo
+        self.Lc= 1      #Longitud de la celda/periodo
 
         #Slide 20
         self.delta= 0 #Error de momento 𝛿
-        self.ld = 0.015 # Longitud del dipolo (m)
-        self.rho = 3.81  # Radio de curvatura (m)
+        self.ld = 0.015 #Longitud del dipolo (m)
+        self.rho= 3.81  # Radio de curvatura (m)
         self.Lc2 = 5.8  # Longiutd de la celda(m)
-        
 
 
 p= Parametroslattice() #instanciamos los para´metros
@@ -31,7 +32,7 @@ p= Parametroslattice() #instanciamos los para´metros
 
 # Dsicretización del dominio 's': 
 
-ds = 0.00025 # Tamaño del paso (m) 
+ds= 0.00025 # Tamaño del paso (m) 
 s_end1= 100* p.Lc
 s_vector1 = np.arange(0,s_end1 + ds,ds)
 
@@ -41,12 +42,12 @@ s_vector2 = np.arange(0,s_end2+ ds, ds)
 
 
 #Cond. iniciales
-x0 = 1e-3 # pos incial Xo
-dxds_0 = 0 # aangulo inicial X'o
-y0 = np.array([x0,dxds_0]) #Estado inicial del sistema, con pos y ángulo iniciales
+x0= 1e-3 # pos incial Xo
+dxds_0= 0 # aangulo inicial X'o
+y0= np.array([x0,dxds_0]) #Estado inicial del sistema, con pos y ángulo iniciales
 
 # iInner diametre of beam pipe
- 
+radiopipe= 0.02765 # inner radio en m
 
 # Se invocan los 'modelos'
 # modelo1 = hills_lineal_hom(k_func=lambda s: kquad(s, p))
@@ -81,20 +82,31 @@ def actδ(nuevo_delta):
     p.delta = nuevo_delta # acttualiza el parámetro delta directamente en el objeto
 
 valores_delta= [-0.02, -0.01, 0, 0.01, 0.02]
-plot_poincareδ(
-    modeloEDO= modelo2, 
-    y0= y0, 
-    s_vector= s_vector2, 
-    ds=ds , 
-    periodo= p.Lc2, 
-    valsdelta= valores_delta, 
-    actualizardelta= actδ, 
-    filename="poincare_dispersion.png"
+# plot_poincareδ(
+#     modeloEDO= modelo2, 
+#     y0= y0, 
+#     s_vector= s_vector2, 
+#     ds=ds , 
+#     periodo= p.Lc2, 
+#     valsdelta= valores_delta, 
+#     actualizardelta= actδ, 
+#     filename="poincare_dispersion.png"
+# )
+
+
+
+s_vector_corto = s_vector2[s_vector2 <= 30 * p.Lc2]
+
+trayectorias(
+    modeloEDO=modelo2,
+    y0=y0,
+    s_vector=s_vector_corto,
+    ds=ds,
+    valsdelta=valores_delta,
+    actualizardelta=actδ,
+    apertura=radiopipe,
+    filename="trayectorias_vs_apertura.png"
 )
-
-
-
-
 #Estabilidad Numeñrica 
 
 # numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
