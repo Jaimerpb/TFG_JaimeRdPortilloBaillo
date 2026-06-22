@@ -218,25 +218,6 @@ y2 = rk4(modelo2, y0, s_vector2, ds )
 
 
 
-# Hill depende de s, así que el campo se congela en un s de referencia para dibujarlo.
-# s_ref = first(s_vector2)
-# k_ref = k20(s_ref)
-# inh_ref = inhom(s_ref)
-# phase_field(x, v) = [v, -k_ref * x + inh_ref]
-# x_min, x_max = extrema(y1[1, :]); v_min, v_max = extrema(y1[2, :])
-# pad_x = max(0.1, 0.3 * max(abs(x_min), abs(x_max))); pad_v = max(0.1, 0.3 * max(abs(v_min), abs(v_max)))
-# x_grid = range(x_min - pad_x, x_max + pad_x, length=18); v_grid = range(v_min - pad_v, v_max + pad_v, length=18)
-# lims_x = (x_min - pad_x, x_max + pad_x); lims_v = (v_min - pad_v, v_max + pad_v)
-
-# fig1 = plot_vector_field(x_grid, v_grid, phase_field, scale=0.35, lw=1, colorbar=false)
-# xlabel!("x"); ylabel!("x'"); title!("Campo vectorial de Hills, slide20"); xlims!(lims_x...); ylims!(lims_v...); display(fig1)
-
-
-# fig2 = plot_phase_portrait(x_grid, v_grid, phase_field, 20.0, lw=1)
-# xlabel!("x"); ylabel!("x'"); title!("Retrato de fases de Hills, slide20"); xlims!(lims_x...); ylims!(lims_v...); display(fig2)
-
-
-
 
 
 
@@ -297,7 +278,6 @@ y2 = rk4(modelo2, y0, s_vector2, ds )
 #           size=(1000, 400), linewidth=2, color=:blue)
 # display(p3)
 
-# 1. Ajuste CLAVE: Un paso que coincida exactamente con las fronteras de los imanes
 ds_fino = 0.00025 
 s_vector2_fino = collect(0:ds_fino:s_end2)
 

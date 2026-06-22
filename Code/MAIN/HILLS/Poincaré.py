@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from RK import rk4
 from plotting import save_figure
 
-def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titulo="Mapa de Poincaré"):
+def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, apertura,filename, titulo="Mapa de Poincaré"):
     
     """
     Crea y guarda un mapa de Poincaré para múltiples condiciones iniciales
@@ -17,8 +17,8 @@ def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titul
     """
     plt.figure(figsize=(9, 6))
     plt.title(titulo)
-    plt.xlabel("x [m]")
-    plt.ylabel("x' [rad]")
+    plt.xlabel("x")
+    plt.ylabel("x' ")
 
     # Se calculan los índices de Poincaré, son los índices en el svector correspondientes a s= n*L, o múltiplos enteros de L (L, el periodo y longitud de la celda)
     pasosXperiodo = int(round(periodo/ ds))
@@ -31,12 +31,13 @@ def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titul
         y= rk4(modeloEDO, y0_act, s_vector, ds) #u sando el modelo que le pasemos
 
        
-        x_p = y[0, indices_poincare]
+        x_p =y[0, indices_poincare]
         xp_p = y[1,indices_poincare]
         
-        plt.scatter(x_p, xp_p, s=1.5, alpha =0.7, label=f"x_0 = {x0*1000} mm")
-
-
+        plt.scatter(x_p, xp_p, s=1.5, alpha =0.7, label=f"x_0 = {x0} mm")
+    
+    plt.axvline(x= apertura, color='red',linestyle= '--',linewidth=2.5, label='Apertura Física')
+    plt.axvline(x= -apertura, color='red', linestyle= '--' ,linewidth=2.5)
     plt.gca().set_aspect('auto') 
     plt.grid(True, alpha=0.3, linestyle='--')
     plt.legend(loc='upper right', fontsize=10)
@@ -45,7 +46,7 @@ def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titul
     save_figure(filename) # se guarda la figura con la función 'save_figure' del módulo plotting.py 
 
 
-def plot_poincareδ(modeloEDO, y0,s_vector, ds, periodo, valsdelta, actualizardelta, filename = "Poincare Dispersion.png") :
+def plot_poincareδ(modeloEDO, y0,s_vector, ds, periodo, valsdelta, actualizardelta, apertura, filename = "Poincare Dispersion.png") :
     """
     Crea y guarda un mapa de Poincaré para distintos valroes de delta.
 
@@ -77,11 +78,15 @@ def plot_poincareδ(modeloEDO, y0,s_vector, ds, periodo, valsdelta, actualizarde
         x_p = y[0,indices_poincare]
         xp_p = y[1, indices_poincare]
         
-        # 4. Añadimos la elipse al gráfico
+        #se añadr la elipse al gráfico
         plt.scatter(x_p, xp_p, s=3, alpha=0.8, label=f"δ = {valdelta}")
 
     # se reestaura el valor de δ por seguridad a un valor neutro
     actualizardelta(0)
+
+    #se añadre la apertura al gráfico
+    plt.axvline(x= apertura, color='red',linestyle= '--', linewidth=2.5, label='Apertura Física')
+    plt.axvline(x= -apertura, color='red', linestyle= '--' ,linewidth=2.5)
 
     plt.gca().set_aspect('auto')
     plt.grid(True, alpha=0.3, linestyle='--')

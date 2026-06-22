@@ -8,7 +8,7 @@ from auxiliar import kquad , k20, inhom
 from Poincaré import plot_poincare1,plot_poincareδ
 from numericalstability import numstability
 from plotting import save_figure
-from offmomentum import trayectorias
+from offmomentum import trayectoriasb, trayectoriasδ
 
 
 class Parametroslattice:
@@ -32,11 +32,11 @@ p= Parametroslattice() #instanciamos los para´metros
 
 # Dsicretización del dominio 's': 
 
-ds= 0.00025 # Tamaño del paso (m) 
+ds= 0.00025 #Tamaño del paso (m) 
 s_end1= 100* p.Lc
-s_vector1 = np.arange(0,s_end1 + ds,ds)
+s_vector1 = np.arange(0,s_end1 + ds, ds)
 
-s_end2 = 80*p.Lc2
+s_end2 = 70*p.Lc2
 s_vector2 = np.arange(0,s_end2+ ds, ds)
 
 
@@ -50,7 +50,7 @@ y0= np.array([x0,dxds_0]) #Estado inicial del sistema, con pos y ángulo inicial
 radiopipe= 0.02765 # inner radio en m
 
 # Se invocan los 'modelos'
-# modelo1 = hills_lineal_hom(k_func=lambda s: kquad(s, p))
+modelo1 = hills_lineal_hom(k_func=lambda s: kquad(s, p))
 modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc = lambda s:inhom(s,p))
 # modelo3 = hillssext_off(k_func = k20,inhomfunc = inhom,ksextfunc = ksext)
     
@@ -59,58 +59,43 @@ modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc = lambda s:
 # Soluciones del Runge Kutta
 # y1 = rk4(modelo1, y0, s_vector1, ds)
 # print(y1)
-
 # y2= rk4(modelo2,y0, s_vector2, ds)
 # print(y2)
-
 # y3 = rk4(modelo3, y0, s_vector2, ds)
 # print(y3)
 
 
 
-# Mapa de Poincaré para cada sistema
 
-# x0s = np.linspace(0,5e-3,3)
+
+#Mapa de Poincaré para cada sistema
+x0s= np.linspace(0,5e-3,3)
 
 # plot_poincare1(modelo1, x0s, s_vector1,ds,p.Lc, "Poincaré Hills Lineal Homogeneo.png",titulo= "Mapa de Poinca´re: FODO only quads")
 # plot_poincare1(modelo2,x0s, s_vector2, ds, p.Lc2, "Poincaré Hills Lineal No HOmogeneo.png", titulo= "Mapa de Poincaré: FODO quads + BEND + offmomentum " )
 # plot_poincare1(modelo3, x0s,s_vector2, ds, Lc2,"Poincaré Hills No Lineal.png", titulo=  "Mapa de Poinaré: quads+BEND + off-momentum + sextupoles")
 
 
-# Mapa de Poincaré para distintos valores de delta usando tu función del módulo
-def actδ(nuevo_delta):
-    p.delta = nuevo_delta # acttualiza el parámetro delta directamente en el objeto
+#Mapa de Poincaré para distintos valores de delta usando tu función del módulo
+# def actδ(nuevo_delta):
+    # p.delta= nuevo_delta # acttualiza el parámetro delta directamente en el objeto
 
-valores_delta= [-0.02, -0.01, 0, 0.01, 0.02]
-# plot_poincareδ(
-#     modeloEDO= modelo2, 
-#     y0= y0, 
-#     s_vector= s_vector2, 
-#     ds=ds , 
-#     periodo= p.Lc2, 
-#     valsdelta= valores_delta, 
-#     actualizardelta= actδ, 
-#     filename="poincare_dispersion.png"
-# )
+# valoresδ= [-0.2, -0.1, 0, 0.1, 0.2]
+
+# plot_poincareδ(modelo2, y0, s_vector2, ds, p.Lc2, valoresδ, actδ,radiopipe, filename= "Poincaré Dispersion.png")
+
+
+#Trayectorias para las distintas dispersiones, fijando cond. inic y0
+# shortsvector= np.arange(0, 40*p.Lc2 + ds, ds)
+
+# trayectoriasδ(modelo2, y0, shortsvector,ds, valoresδ, actδ, apertura=radiopipe, filename="Trayectorias vs Apert.png")
 
 
 
-s_vector_corto = s_vector2[s_vector2 <= 30 * p.Lc2]
+# Estabilidad Numérica (para ccada uno de los modelo)
 
-trayectorias(
-    modeloEDO=modelo2,
-    y0=y0,
-    s_vector=s_vector_corto,
-    ds=ds,
-    valsdelta=valores_delta,
-    actualizardelta=actδ,
-    apertura=radiopipe,
-    filename="trayectorias_vs_apertura.png"
-)
-#Estabilidad Numeñrica 
-
-# numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
-# numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom.")
+numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
+numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom.")
 # numstability(modelo3, y0, s_end2, ds, "Estabilidadc nUmérica Hills No lineal")
 
 
