@@ -15,7 +15,7 @@ def numstability(modeloEDO, y0, s_end, ds, filename):
     """
     # Definimos los pasos a explorar basados en el paso nominal ds
     h_step_values = ds/np.array([0.01, 0.1, 0.5, 1 ,2, 4])
-    desv_relativa = []
+    desv_relativa= []
 
    
     hanterior = 2* ds
@@ -37,7 +37,7 @@ def numstability(modeloEDO, y0, s_end, ds, filename):
         # esto es para comparar en los mismos puntos (np.interp)
         x_anterior_interp= np.interp(s_vector_actual , s_vector_anterior, x_iteracion_anterior)
 
-        # Error absoluto y error relativo
+        #error absoluto y error relativo
         # Ahora sí, se están restando vectores de igual dimensión. 
         error_abs = np.linalg.norm(x_actual- x_anterior_interp)
         desv_rel = error_abs/ np.linalg.norm(x_anterior_interp)

@@ -54,3 +54,29 @@ def trayectoriasδ(modeloEDO, y0, s_vector, ds, valsdelta, actualizardelta, aper
     plt.grid(True, alpha = 0.4, linestyle= '--')
     plt.legend(loc= 'upper right', fontsize = 14)
     save_figure(filename)
+
+
+
+def colormapApertura(modeloEDO, s_vector, ds, deltas,X0range, actualizardelta, apertura,filename='colormapapertura.png'):
+
+       
+    #se incializa la matriz para lso resultados
+    Z = np.zeros((len(X0range), len(deltas)))
+
+    for i,x0 in enumerate(X0range):
+        for j,delta in enumerate (deltas):
+            y0aux= np.array([x0,0])
+            y = rk4(modeloEDO, y0aux,s_vector,ds)
+
+            #se busca el desplazamiento max en la simulació
+            max_amp = np.max(np.abs(y[0,:]))
+
+            # si supera la apertura, se marca como Nan(partícula perdida)
+            if max_amp> apertura:
+                Z[i,j] = np.nan
+            else:
+                Z[i,j] = max_amp
+
+    actualizardelta(0)
+
+    
