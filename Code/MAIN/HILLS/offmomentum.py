@@ -79,4 +79,29 @@ def colormapApertura(modeloEDO, s_vector, ds, deltas,X0range, actualizardelta, a
 
     actualizardelta(0)
 
+    plt.figure(figsize= (10,8))
+    # config. del colormap. Los NaN se pintan en negro.
+    cmap= plt.cm.viridis.copy()
+    cmap.set_bad(color='black')
+
+    #pcolormesh para el heatmap
+    X, Y = np.meshgrid(deltas, X0range)
+    mesh = plt.pcolormesh(X, Y, Z, cmap=cmap, shading='auto')
+
+    # Bbarra de color con etiqueta
+    cbar= plt.colorbar(mesh)
+    cbar.set_label('Amplitud Máxima |x| [m]', fontsize=16)
+    cbar.ax.tick_params(labelsize=14)
+
+    plt.title("Apertura Física y Dinámica (Zonas Negras = Haz Perdido)", fontsize=18, pad=15)
+    plt.xlabel("Error de Momento (δ)", fontsize=18)
+    plt.ylabel("Posición Inicial $x_0$ [m]", fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+    save_figure(filename)
+
+
+
+
     

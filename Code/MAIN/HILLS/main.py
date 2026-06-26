@@ -8,7 +8,7 @@ from auxiliar import kquad , k20, inhom
 from Poincaré import plot_poincare1,plot_poincareδ
 from numericalstability import numstability
 from plotting import save_figure
-from offmomentum import trayectoriasb, trayectoriasδ
+from offmomentum import trayectoriasb, trayectoriasδ,colormapApertura
 
 
 class Parametroslattice:
@@ -18,7 +18,7 @@ class Parametroslattice:
         self.k_val= 0.519 # Es la fuerza de los cuadrupolos(1/m2)
         self.lq1= 0.4   #Longitud del cuadrupolo (m)
         self.l_i = 0     # Pos. entrada (m)
-        self.Lc= 1      #Longitud de la celda/periodo
+        self.Lc= 1      #Longitud de la celda/periodo (m)
 
         #Slide 20
         self.delta= 0 #Error de momento 𝛿
@@ -51,12 +51,13 @@ radiopipe= 0.02765 # inner radio en m
 
 # Se invocan los 'modelos'
 modelo1 = hills_lineal_hom(k_func=lambda s: kquad(s, p))
-modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc = lambda s:inhom(s,p))
+modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc= lambda s:inhom(s,p))
 # modelo3 = hillssext_off(k_func = k20,inhomfunc = inhom,ksextfunc = ksext)
     
 
 
 # Soluciones del Runge Kutta
+
 # y1 = rk4(modelo1, y0, s_vector1, ds)
 # print(y1)
 # y2= rk4(modelo2,y0, s_vector2, ds)
@@ -65,10 +66,18 @@ modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc = lambda s:
 # print(y3)
 
 
+# Estabilidad Numérica (para ccada uno de los modelo)
+
+# numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
+# numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom.")
+# numstability(modelo3, y0, s_end2, ds, "Estabilidadc nUmérica Hills No lineal")
 
 
 
-#Mapa de Poincaré para cada sistema
+
+
+# Mapa de Poincaré para cada sistema
+
 x0s= np.linspace(0,5e-3,3)
 
 # plot_poincare1(modelo1, x0s, s_vector1,ds,p.Lc, "Poincaré Hills Lineal Homogeneo.png",titulo= "Mapa de Poinca´re: FODO only quads")
@@ -77,8 +86,8 @@ x0s= np.linspace(0,5e-3,3)
 
 
 #Mapa de Poincaré para distintos valores de delta usando tu función del módulo
-# def actδ(nuevo_delta):
-    # p.delta= nuevo_delta # acttualiza el parámetro delta directamente en el objeto
+def actδ(nuevo_delta):
+    p.delta= nuevo_delta # acttualiza el parámetro delta directamente en el objeto
 
 # valoresδ= [-0.2, -0.1, 0, 0.1, 0.2]
 
@@ -92,15 +101,16 @@ x0s= np.linspace(0,5e-3,3)
 
 
 
-# Estabilidad Numérica (para ccada uno de los modelo)
-
-numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
-numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom.")
-# numstability(modelo3, y0, s_end2, ds, "Estabilidadc nUmérica Hills No lineal")
 
 
+#--> Beam survivial heatmap
+
+# seh hace un barrido mucho más (fino para una mejor resolución
+deltagrid = np.linspace(-0.2, 0.2, 10)
+x0grid= np.linspace(0, radiopipe,10 ) # se 'inyectan' parts desde el centro hasta la pared
 
 
+colormapApertura(modelo2, s_vector2,ds, deltagrid, x0grid, actδ, radiopipe, filename='Beam Survival.png' )
 
 
 
@@ -145,7 +155,7 @@ numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom
 # plt.plot(s_vector2, y2[0, :], label='Posición (x)')
 # plt.plot(s_vector2, y2[1, :], label='Velocidad (v)')
 # plt.title("Hills eq usando RK4")
-# plt.xlabel("Tiempo (t)")
+# plt.xlabel("Distancia (s)")
 # plt.ylabel("Amplitud")
 # plt.legend()
 # plt.grid(True)
@@ -194,3 +204,4 @@ numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom
 # plt.xlim(0, s_end) 
 # plt.legend()
 # plt.grid(True)
+# save_figure(filename="RK4 vs Thin Lens Approxi.")

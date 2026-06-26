@@ -57,7 +57,7 @@ def plot_poincareδ(modeloEDO, y0,s_vector, ds, periodo, valsdelta, actualizarde
     s_vector: discretización del dominio sz
     periodo: longitud de la celda 
     valsdelta : lista con distintos deltas
-    actualizardleta: callback para actualizar el valor de delta en el script principal
+    actualizardleta: callback para actualizar el valor de delta en el script principal (mani.py)
 
     """
 
