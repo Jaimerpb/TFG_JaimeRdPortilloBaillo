@@ -58,8 +58,8 @@ modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc= lambda s:i
 
 # Soluciones del Runge Kutta
 
-# y1 = rk4(modelo1, y0, s_vector1, ds)
-# print(y1)
+y1 = rk4(modelo1, y0, s_vector1, ds)
+print(y1)
 # y2= rk4(modelo2,y0, s_vector2, ds)
 # print(y2)
 # y3 = rk4(modelo3, y0, s_vector2, ds)
@@ -103,14 +103,14 @@ def actδ(nuevo_delta):
 
 
 
-#--> Beam survivial heatmap
+# #--> Beam survivial heatmap
 
-# seh hace un barrido mucho más (fino para una mejor resolución
-deltagrid = np.linspace(-0.2, 0.2, 10)
-x0grid= np.linspace(0, radiopipe,10 ) # se 'inyectan' parts desde el centro hasta la pared
+# # seh hace un barrido mucho más (fino para una mejor resolución
+# deltagrid = np.linspace(-0.2, 0.2, 10)
+# x0grid= np.linspace(0, radiopipe,10 ) # se 'inyectan' parts desde el centro hasta la pared
 
 
-colormapApertura(modelo2, s_vector2,ds, deltagrid, x0grid, actδ, radiopipe, filename='Beam Survival.png' )
+# colormapApertura(modelo2, s_vector2,ds, deltagrid, x0grid, actδ, radiopipe, filename='Beam Survival.png' )
 
 
 
@@ -165,43 +165,44 @@ colormapApertura(modelo2, s_vector2,ds, deltagrid, x0grid, actδ, radiopipe, fil
 
 
 
-# #COMPARANDO VS SOL ANALÍTICA, Acelerador de la slide 19 (Thin lens approx., ver 7.3)
+#COMPARANDO VS SOL ANALÍTICA, Acelerador de la slide 19 (Thin lens approx., ver 7.3)
 
-# f = 1/ ( k_val*lq1) # dsitancia focal
-# L= Lc /2 # longitud entre quads
+f = 1/ (p.k_val*p.lq1) # dsitancia focal
+L= p.Lc /2 # longitud entre quads
 
-# # Matriz de transferencia FODO cell
-# M = np.array([
-#     [1 - (L**2)/(2*f**2), 2*L*  (1+ L/(2*f))],
-#     [-(L/(2*f**2)) * (1 - L/(2*f)),  1- (L**2)/(2*f**2)]
-# ])
+# Matriz de transferencia FODO cell
+M = np.array([
+    [1 - (L**2)/(2*f**2), 2*L*  (1+ L/(2*f))],
+    [-(L/(2*f**2)) * (1 - L/(2*f)),  1- (L**2)/(2*f**2)]
+])
 
-# # se iniciazlian los vectores para guardar los estados al final de cada celda
-# s_discret = np.arange(0, s_end+ Lc, Lc)
-# y_thin= np.zeros((2,len( s_discret)))
-# y_thin[:, 0] = y0
+# se iniciazlian los vectores para guardar los estados al final de cada celda
+s_discret = np.arange(0, s_end1+ p.Lc, p.Lc)
+y_thin= np.zeros((2,len( s_discret)))
+y_thin[:, 0] = y0
 
-# # se multiplica la matriz celda a celda 
+# se multiplica la matriz celda a celda 
 
-# for i in range(1, len(s_discret)):
-#      y_thin[:, i] = M @ y_thin[:, i-1 ]
-
-
+for i in range(1, len(s_discret)):
+     y_thin[:, i] = M @ y_thin[:, i-1 ]
 
 
-# #PLOT PRAA COMPARAR
-# plt.figure(figsize=(12,5))
 
-# #esto es la numérica, la del rk4
-# plt.plot(s_vector, y1[0, :], label='Numérica RK4 (Continua)', color='lightgray', linewidth=2)
 
-# # Dibujamos los puntos 'discretos'(por tener un paso mucho más grueso) de la solución teórica
-# plt.plot(s_discret, y_thin[0, :], 'ro', markersize=4, label='Teórica Thin-Lens')
+#PLOT PRAA COMPARAR
+plt.figure(figsize=(12,5))
 
-# plt.title("Dinámica Transversal: RK4 vs Thin Lens Approxi")
-# plt.xlabel("s(m)")
-# plt.ylabel("x(s)")
-# plt.xlim(0, s_end) 
-# plt.legend()
-# plt.grid(True)
-# save_figure(filename="RK4 vs Thin Lens Approxi.")
+#esto es la numérica, la del rk4
+plt.plot(s_vector1, y1[0, :], label='Numérica RK4 (Continua)', color='lightgray', linewidth=2)
+
+# Dibujamos los puntos 'discretos'(por tener un paso mucho más grueso) de la solución teórica
+plt.plot(s_discret, y_thin[0, :], 'ro', markersize=4, label='Teórica Thin-Lens')
+
+plt.title("Dinámica Transversal: RK4 vs Thin Lens Approxi")
+plt.xlabel("s(m)")
+plt.ylabel("x(s)")
+plt.xlim(0, s_end1) 
+plt.legend()
+plt.grid(True)
+save_figure(filename="RK4 vs Thin Lens Approxi.")
+
