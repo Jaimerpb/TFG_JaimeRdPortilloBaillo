@@ -58,8 +58,8 @@ modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc= lambda s:i
 
 # Soluciones del Runge Kutta
 
-y1 = rk4(modelo1, y0, s_vector1, ds)
-print(y1)
+# y1 = rk4(modelo1, y0, s_vector1, ds)
+# print(y1)
 # y2= rk4(modelo2,y0, s_vector2, ds)
 # print(y2)
 # y3 = rk4(modelo3, y0, s_vector2, ds)
@@ -69,9 +69,9 @@ print(y1)
 
 # Estabilidad numérica (para cada uno de los modelos)
 
-numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
-numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom.")
-## numstability(modelo3, y0, s_end2, ds, "Estabilidadc nUmérica Hills No lineal")
+# numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
+# numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom.")
+# ## numstability(modelo3, y0, s_end2, ds, "Estabilidadc nUmérica Hills No lineal")
 
 
 
@@ -124,20 +124,21 @@ def actδ(nuevo_delta):
 
 
 
-# #Grafica de k(S), pero limitada a 4 celdsa para mayor legibilidad
-# s_plot_end = 4 * Lc2
+# #Grafica de k(S), pero limitada a n celdsa para mayor legibilidad
+# n= 4
+# s_plot_end = n * p.Lc2
 # s_plot = np.arange(0, s_plot_end + ds, ds)
-# k_values_4cells = k20(s_plot)
+# k_values_ncells = k20(s_plot, p)
 
 # fig = plt.figure(figsize=(10, 3))
-# plt.step(s_plot, k_values_4cells, where='post')
-# plt.title("k(s) — 4 celdas")
+# plt.step(s_plot, k_values_ncells, where='post')
+# plt.title("k(s) — n celdas")
 # plt.xlabel("s")
 # plt.ylabel("k")
-# plt.ylim(min(-1.5, np.min(k_values_4cells) - 0.1), max(1.5, np.max(k_values_4cells) + 0.1))
+# plt.ylim(min(-1.5, np.min(k_values_ncells) - 0.1), max(1.5, np.max(k_values_ncells) + 0.1))
 # plt.grid(True)
 # plt.tight_layout()
-
+# save_figure("k(s) Slide 20")
 
 
 
@@ -159,8 +160,6 @@ def actδ(nuevo_delta):
 # plt.ylabel("Amplitud")
 # plt.legend()
 # plt.grid(True)
-
-
 
 
 
