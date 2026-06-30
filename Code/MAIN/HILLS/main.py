@@ -66,12 +66,12 @@ print(y1)
 # print(y3)
 
 
-# Estabilidad Numérica (para ccada uno de los modelo)
 
-# numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
-# numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom.")
-# numstability(modelo3, y0, s_end2, ds, "Estabilidadc nUmérica Hills No lineal")
+# Estabilidad numérica (para cada uno de los modelos)
 
+numstability(modelo1, y0, s_end1, ds, "Establidad numérica Hills Lineal Hom.")
+numstability(modelo2, y0, s_end2, ds, "Estabilidad Numérica Hills Lineal No Hom.")
+## numstability(modelo3, y0, s_end2, ds, "Estabilidadc nUmérica Hills No lineal")
 
 
 
@@ -165,44 +165,44 @@ def actδ(nuevo_delta):
 
 
 
-#COMPARANDO VS SOL ANALÍTICA, Acelerador de la slide 19 (Thin lens approx., ver 7.3)
+ # #COMPARANDO VS SOL ANALÍTICA, Acelerador de la slide 19 (Thin lens approx., ver 7.3)
 
-f = 1/ (p.k_val*p.lq1) # dsitancia focal
-L= p.Lc /2 # longitud entre quads
+# f = 1/ (p.k_val*p.lq1) # dsitancia focal
+# L= p.Lc /2 # longitud entre quads
 
-# Matriz de transferencia FODO cell
-M = np.array([
-    [1 - (L**2)/(2*f**2), 2*L*  (1+ L/(2*f))],
-    [-(L/(2*f**2)) * (1 - L/(2*f)),  1- (L**2)/(2*f**2)]
-])
+# # Matriz de transferencia FODO cell
+# M = np.array([
+#     [1 - (L**2)/(2*f**2), 2*L*  (1+ L/(2*f))],
+#     [-(L/(2*f**2)) * (1 - L/(2*f)),  1- (L**2)/(2*f**2)]
+# ])
 
-# se iniciazlian los vectores para guardar los estados al final de cada celda
-s_discret = np.arange(0, s_end1+ p.Lc, p.Lc)
-y_thin= np.zeros((2,len( s_discret)))
-y_thin[:, 0] = y0
+# # se iniciazlian los vectores para guardar los estados al final de cada celda
+# s_discret = np.arange(0, s_end1+ p.Lc, p.Lc)
+# y_thin= np.zeros((2,len( s_discret)))
+# y_thin[:, 0] = y0
 
-# se multiplica la matriz celda a celda 
+# # se multiplica la matriz celda a celda 
 
-for i in range(1, len(s_discret)):
-     y_thin[:, i] = M @ y_thin[:, i-1 ]
-
-
+# for i in range(1, len(s_discret)):
+#      y_thin[:, i] = M @ y_thin[:, i-1 ]
 
 
-#PLOT PRAA COMPARAR
-plt.figure(figsize=(12,5))
 
-#esto es la numérica, la del rk4
-plt.plot(s_vector1, y1[0, :], label='Numérica RK4 (Continua)', color='lightgray', linewidth=2)
 
-# Dibujamos los puntos 'discretos'(por tener un paso mucho más grueso) de la solución teórica
-plt.plot(s_discret, y_thin[0, :], 'ro', markersize=4, label='Teórica Thin-Lens')
+# #PLOT PRAA COMPARAR
+# plt.figure(figsize=(12,5))
 
-plt.title("Dinámica Transversal: RK4 vs Thin Lens Approxi")
-plt.xlabel("s(m)")
-plt.ylabel("x(s)")
-plt.xlim(0, s_end1) 
-plt.legend()
-plt.grid(True)
-save_figure(filename="RK4 vs Thin Lens Approxi.")
+# #esto es la numérica, la del rk4
+# plt.plot(s_vector1, y1[0, :], label='Numérica RK4 (Continua)', color='lightgray', linewidth=2)
+
+# # Dibujamos los puntos 'discretos'(por tener un paso mucho más grueso) de la solución teórica
+# plt.plot(s_discret, y_thin[0, :], 'ro', markersize=4, label='Teórica Thin-Lens')
+
+# plt.title("Dinámica Transversal: RK4 vs Thin Lens Approxi")
+# plt.xlabel("s(m)")
+# plt.ylabel("x(s)")
+# plt.xlim(0, s_end1) 
+# plt.legend()
+# plt.grid(True)
+# save_figure(filename="RK4 vs Thin Lens Approxi.")
 

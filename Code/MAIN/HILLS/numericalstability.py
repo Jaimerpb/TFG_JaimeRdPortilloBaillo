@@ -54,7 +54,7 @@ def numstability(modeloEDO, y0, s_end, ds, filename):
     plt.figure(figsize=(10, 6))
     plt.plot(h_step_values, desv_relativa, marker='o', color='purple',  
              linewidth=2.5, markersize=8, label='Desviación relativa')
-
+    plt.axhline(y=1e-6, color='red', linestyle='--', linewidth=2, label=r'Tolerancia ($10^{-6}$)')
     plt.gca().invert_xaxis() # invierte el eje x para que la gráfica avance a medida que h decrece
     plt.xscale('log', base= 10)    
     plt.yscale('log', base=10)  
@@ -69,3 +69,4 @@ def numstability(modeloEDO, y0, s_end, ds, filename):
     
     
     save_figure(filename)
+
