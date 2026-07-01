@@ -9,7 +9,7 @@ from Poincaré import plot_poincare1,plot_poincareδ
 from numericalstability import numstability
 from plotting import save_figure
 from offmomentum import trayectoriasb, trayectoriasδ,colormapApertura
-
+from Slide20validation import comparativa_trayectorias
 
 class Parametroslattice:
     def __init__(self):
@@ -60,10 +60,12 @@ modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc= lambda s:i
 
 # y1 = rk4(modelo1, y0, s_vector1, ds)
 # print(y1)
-# y2= rk4(modelo2,y0, s_vector2, ds)
+y2= rk4(modelo2,y0, s_vector2, ds)
 # print(y2)
 # y3 = rk4(modelo3, y0, s_vector2, ds)
 # print(y3)
+
+
 
 
 
@@ -78,10 +80,10 @@ modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc= lambda s:i
 
 # Mapa de Poincaré para cada sistema
 
-x0s= np.linspace(0,5e-3,3)
+# x0s= np.linspace(0,5e-3,3)
 
 # plot_poincare1(modelo1, [x0], s_vector1,ds,p.Lc, "Poincaré Hills Lineal Homogeneo.png",titulo= "Mapa de Poinca´re Slide 19 Rk4")
-plot_poincare1(modelo2, [x0], s_vector2, ds, p.Lc2, "Poincaré Hills Lineal Slide20.png", titulo= "Mapa de Poincaré Slide 20 RK4")
+# plot_poincare1(modelo2, [x0], s_vector2, ds, p.Lc2, "Poincaré Hills Lineal Slide20.png", titulo= "Mapa de Poincaré Slide 20 RK4")
 # plot_poincare1(modelo3, x0s,s_vector2, ds, p.Lc2,"Poincaré Hills No Lineal.png", titulo=  "Mapa de Poinaré: quads+BEND + off-momentum + sextupoles")
 
 
@@ -98,6 +100,12 @@ def actδ(nuevo_delta):
 # shortsvector= np.arange(0, 40*p.Lc2 + ds, ds)
 
 # trayectoriasδ(modelo2, y0, shortsvector,ds, valoresδ, actδ, apertura=radiopipe, filename="Trayectorias vs Apert.png")
+
+
+# Validación Slide 20 vs RfTrack
+comparativa_trayectorias("transport_table.txt", s_vector2, y2[0, :], "RK4_vs_RFTrack_S20.png")
+
+
 
 
 
