@@ -62,7 +62,7 @@ def plot_poincareTHEO(archivo_txt, filename="RFTrack_Poincare.png"):
     x_mm = data[:, 0]
     xp_mrad = data[:, 1]
         
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(9, 6))
     plt.title("Mapa de Poincaré Slide 20 (Solución Teórica RF-Track)", fontsize=18, pad=15)
     
     plt.scatter(x_mm, xp_mrad, s=15, color='darkred', alpha=0.7, label='Puntos RF-Track')

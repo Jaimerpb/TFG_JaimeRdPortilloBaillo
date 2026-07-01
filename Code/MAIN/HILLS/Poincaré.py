@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from RK import rk4
 from plotting import save_figure
 
-def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, apertura,filename, titulo="Mapa de Poincaré"):
+def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titulo="Mapa de Poincaré"):
     
     """
     Crea y guarda un mapa de Poincaré para múltiples condiciones iniciales
@@ -17,8 +17,8 @@ def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, apertura,filena
     """
     plt.figure(figsize=(9, 6))
     plt.title(titulo)
-    plt.xlabel("x")
-    plt.ylabel("x' ")
+    plt.xlabel("$x$")
+    plt.ylabel("$x'$ ")
 
     # Se calculan los índices de Poincaré, son los índices en el svector correspondientes a s= n*L, o múltiplos enteros de L (L, el periodo y longitud de la celda)
     pasosXperiodo = int(round(periodo/ ds))
@@ -34,10 +34,9 @@ def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, apertura,filena
         x_p =y[0, indices_poincare]
         xp_p = y[1,indices_poincare]
         
-        plt.scatter(x_p, xp_p, s=1.5, alpha =0.7, label=f"x_0 = {x0} mm")
+        plt.scatter(x_p, xp_p, s=1.5, alpha =0.7, label=f"x_0 = {x0} m")
     
-    plt.axvline(x= apertura, color='red',linestyle= '--',linewidth=2.5, label='Apertura Física')
-    plt.axvline(x= -apertura, color='red', linestyle= '--' ,linewidth=2.5)
+
     plt.gca().set_aspect('auto') 
     plt.grid(True, alpha=0.3, linestyle='--')
     plt.legend(loc='upper right', fontsize=10)

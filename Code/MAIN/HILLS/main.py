@@ -80,9 +80,9 @@ modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc= lambda s:i
 
 x0s= np.linspace(0,5e-3,3)
 
-# plot_poincare1(modelo1, x0s, s_vector1,ds,p.Lc, "Poincaré Hills Lineal Homogeneo.png",titulo= "Mapa de Poinca´re: FODO only quads")
-# plot_poincare1(modelo2,x0s, s_vector2, ds, p.Lc2, "Poincaré Hills Lineal No HOmogeneo.png", titulo= "Mapa de Poincaré: FODO quads + BEND + offmomentum " )
-# plot_poincare1(modelo3, x0s,s_vector2, ds, Lc2,"Poincaré Hills No Lineal.png", titulo=  "Mapa de Poinaré: quads+BEND + off-momentum + sextupoles")
+# plot_poincare1(modelo1, [x0], s_vector1,ds,p.Lc, "Poincaré Hills Lineal Homogeneo.png",titulo= "Mapa de Poinca´re Slide 19 Rk4")
+plot_poincare1(modelo2, [x0], s_vector2, ds, p.Lc2, "Poincaré Hills Lineal Slide20.png", titulo= "Mapa de Poincaré Slide 20 RK4")
+# plot_poincare1(modelo3, x0s,s_vector2, ds, p.Lc2,"Poincaré Hills No Lineal.png", titulo=  "Mapa de Poinaré: quads+BEND + off-momentum + sextupoles")
 
 
 #Mapa de Poincaré para distintos valores de delta usando tu función del módulo
@@ -192,7 +192,7 @@ def actδ(nuevo_delta):
 # plt.figure(figsize=(12,5))
 
 # #esto es la numérica, la del rk4
-# plt.plot(s_vector1, y1[0, :], label='Numérica RK4 (Continua)', color='lightgray', linewidth=2)
+# plt.plot(s_vector1, y1[0, :], label='Numérica RK4 (\'Continua\')', color='lightgray', linewidth=2)
 
 # # Dibujamos los puntos 'discretos'(por tener un paso mucho más grueso) de la solución teórica
 # plt.plot(s_discret, y_thin[0, :], 'ro', markersize=4, label='Teórica Thin-Lens')
