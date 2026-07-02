@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from RK import rk4
 from plotting import save_figure
 
-def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titulo="Mapa de Poincaré"):
+def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titulo="Mapa de Poincaré", lim_x=(-1.1, 1.1), lim_y=(-0.21, 0.21)):
     
     """
     Crea y guarda un mapa de Poincaré para múltiples condiciones iniciales
@@ -16,9 +16,13 @@ def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titul
      periodo:longitud de la celda para el muestreo
     """
     plt.figure(figsize=(9, 6))
-    plt.title(titulo)
-    plt.xlabel("$x$")
-    plt.ylabel("$x'$ ")
+    
+    # Igualamos el formato del título y las etiquetas a los del RF-Track para poder comparaor
+    plt.title(titulo, fontsize=18, pad=15)
+    plt.xlabel("$x$ [mm]", fontsize=16)
+    plt.ylabel("$x'$ [mrad]", fontsize=16)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
 
     # Se calculan los índices de Poincaré, son los índices en el svector correspondientes a s= n*L, o múltiplos enteros de L (L, el periodo y longitud de la celda)
     pasosXperiodo = int(round(periodo/ ds))
@@ -31,19 +35,23 @@ def plot_poincare1(modeloEDO, x0_valores, s_vector, ds, periodo, filename, titul
         y= rk4(modeloEDO, y0_act, s_vector, ds) #u sando el modelo que le pasemos
 
        
-        x_p =y[0, indices_poincare]
-        xp_p = y[1,indices_poincare]
+        # Multiplicamos por 1000 para pasar de metros a mm y de radianes a mrad
+        x_p = y[0, indices_poincare] * 1000
+        xp_p = y[1, indices_poincare] * 1000
         
-        plt.scatter(x_p, xp_p, s=1.5, alpha =0.7, label=f"x_0 = {x0} m")
+        # Tamaño de punto s=15, para igualar a la teórica
+        plt.scatter(x_p, xp_p, s=15, alpha =0.7, label=f"x_0 = {x0 * 1000} mm")
     
-
+    # Fijamos los mismos límites de ejes para la comparativa
+    plt.xlim(lim_x)
+    plt.ylim(lim_y)
+    
     plt.gca().set_aspect('auto') 
     plt.grid(True, alpha=0.3, linestyle='--')
     plt.legend(loc='upper right', fontsize=10)
     
    
-    save_figure(filename) # se guarda la figura con la función 'save_figure' del módulo plotting.py 
-
+    save_figure(filename) # se guarda la figura con la función 'save_figure' del módulo plotting.py
 
 def plot_poincareδ(modeloEDO, y0,s_vector, ds, periodo, valsdelta, actualizardelta, apertura, filename = "Poincare Dispersion.png") :
     """

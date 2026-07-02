@@ -2,7 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-# Intentamos importar tu función de guardado
+# Intentamos importar tu función de guardado, por si diera eerror.
+
 try:
     from plotting import save_figure
 except ImportError:
@@ -11,9 +12,8 @@ except ImportError:
         plt.show()
         plt.close()
 
-# --- CLAVE PARA EVITAR EL FileNotFoundError ---
-# Obtenemos la ruta exacta de la carpeta donde está guardado ESTE script
-DIRECTORIO_ACTUAL = Path(__file__).parent
+
+DIRECTORIO_ACTUAL= Path(__file__).parent
 
 def plottrayectoriaTHEO(archivo_txt, filename="RFTrack_Trayectoria.png"):
     """
@@ -49,14 +49,12 @@ def plottrayectoriaTHEO(archivo_txt, filename="RFTrack_Trayectoria.png"):
     save_figure(filename)
 
 
-def plot_poincareTHEO(archivo_txt, filename="RFTrack_Poincare.png"):
+def plot_poincareTHEO(archivo_txt, filename="RFTrack_Poincare.png", lim_x=(-1.1, 1.1), lim_y=(-0.21, 0.21)):
     """
-    lEe los puntos de RF-Track y dibuja el mapa de Poincaré (xx').
+    Lee los puntos de RF-Track y dibuja el mapa de Poincaré (xx').
     """
     ruta_completa = DIRECTORIO_ACTUAL/ archivo_txt
     
-
-
     data = np.loadtxt(ruta_completa, skiprows=1)
     
     x_mm = data[:, 0]
@@ -72,6 +70,10 @@ def plot_poincareTHEO(archivo_txt, filename="RFTrack_Poincare.png"):
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     
+    # Fijamos los límites de los ejes para que ambas imágenes coincidan exactamente
+    plt.xlim(lim_x)
+    plt.ylim(lim_y)
+    
     plt.gca().set_aspect('auto')
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend(fontsize=14, loc='upper right')
@@ -81,7 +83,7 @@ def plot_poincareTHEO(archivo_txt, filename="RFTrack_Poincare.png"):
 
 def comparativa_trayectorias(archivo_txt, s_rk4, x_rk4, filename="Comparativa_RK4_vs_RFTrack.png"):
     """
-    Superpone la trayectoria calculada con tu RK4 (en metros) 
+    Superpone la trayectoria calculada conel rk4 (en m)
     con la extraída de RF-Track (en milímetros).
     """
     ruta_completa = DIRECTORIO_ACTUAL / archivo_txt

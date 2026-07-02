@@ -9,22 +9,24 @@ from Poincaré import plot_poincare1,plot_poincareδ
 from numericalstability import numstability
 from plotting import save_figure
 from offmomentum import trayectoriasb, trayectoriasδ,colormapApertura
-from Slide20validation import comparativa_trayectorias
+# from Slide20validation import comparativa_trayectorias, plot_poincareTHEO
 
 class Parametroslattice:
     def __init__(self):
 
         # Sslide 19
-        self.k_val= 0.519 # Es la fuerza de los cuadrupolos(1/m2)
-        self.lq1= 0.4   #Longitud del cuadrupolo (m)
+        self.k_val= 0.541 # Es la fuerza de los cuadrupolos(1/m2)
+        self.lq1 = 0.4   #Longitud del cuadrupolo (m)
         self.l_i = 0     # Pos. entrada (m)
-        self.Lc= 1      #Longitud de la celda/periodo (m)
+        self.Ld  = 0.55*2+1.5      
+        self.Lc  = self.Ld*2+self.lq1*2   #Longitud de la celda/periodo (m)
 
         #Slide 20
         self.delta= 0 #Error de momento 𝛿
-        self.ld = 0.015 #Longitud del dipolo (m)
+        self.lD = 1.5 #Longitud del dipolo (m)
+        self.ld = 0.55 # Longitud del drift (m)
         self.rho= 3.81  # Radio de curvatura (m)
-        self.Lc2 = 5.8  # Longiutd de la celda(m)
+        self.Lc2 = 6  # Longiutd de la celda(m)
 
 
 p= Parametroslattice() #instanciamos los para´metros
@@ -36,7 +38,7 @@ ds= 0.00025 #Tamaño del paso (m)
 s_end1= 100* p.Lc
 s_vector1 = np.arange(0,s_end1 + ds, ds)
 
-s_end2 = 70*p.Lc2
+s_end2 = 50*p.Lc2
 s_vector2 = np.arange(0,s_end2+ ds, ds)
 
 
@@ -46,7 +48,7 @@ x0= 1e-3 # pos incial Xo
 dxds_0= 0 # aangulo inicial X'o
 y0= np.array([x0,dxds_0]) #Estado inicial del sistema, con pos y ángulo iniciales
 
-# iInner diametre of beam pipe
+# iInner diametre of beam pipe, 55.3 mmm. ref. para el latex guardada en la carpeta Bibliografñia, pag4.
 radiopipe= 0.02765 # inner radio en m
 
 # Se invocan los 'modelos'
@@ -58,9 +60,9 @@ modelo2 = hills_lineal_nonhom(k_func = lambda s: k20(s,p), inhomfunc= lambda s:i
 
 # Soluciones del Runge Kutta
 
-# y1 = rk4(modelo1, y0, s_vector1, ds)
+y1 = rk4(modelo1, y0, s_vector1, ds)
 # print(y1)
-y2= rk4(modelo2,y0, s_vector2, ds)
+# y2= rk4(modelo2,y0, s_vector2, ds)
 # print(y2)
 # y3 = rk4(modelo3, y0, s_vector2, ds)
 # print(y3)
@@ -82,14 +84,15 @@ y2= rk4(modelo2,y0, s_vector2, ds)
 
 # x0s= np.linspace(0,5e-3,3)
 
-# plot_poincare1(modelo1, [x0], s_vector1,ds,p.Lc, "Poincaré Hills Lineal Homogeneo.png",titulo= "Mapa de Poinca´re Slide 19 Rk4")
+plot_poincare1(modelo1, [x0], s_vector1,ds,p.Lc, "Poincaré Hills Lineal Homogeneo.png",titulo= "Mapa de Poinca´re Slide 19 Rk4")
 # plot_poincare1(modelo2, [x0], s_vector2, ds, p.Lc2, "Poincaré Hills Lineal Slide20.png", titulo= "Mapa de Poincaré Slide 20 RK4")
+# plot_poincareTHEO("poincare_map.txt")
 # plot_poincare1(modelo3, x0s,s_vector2, ds, p.Lc2,"Poincaré Hills No Lineal.png", titulo=  "Mapa de Poinaré: quads+BEND + off-momentum + sextupoles")
 
 
-#Mapa de Poincaré para distintos valores de delta usando tu función del módulo
-def actδ(nuevo_delta):
-    p.delta= nuevo_delta # acttualiza el parámetro delta directamente en el objeto
+# #Mapa de Poincaré para distintos valores de delta usandofunción del módulo
+# def actδ(nuevo_delta):
+#     p.delta= nuevo_delta # acttualiza el parámetro delta directamente en el objeto
 
 # valoresδ= [-0.2, -0.1, 0, 0.1, 0.2]
 
@@ -103,7 +106,7 @@ def actδ(nuevo_delta):
 
 
 # Validación Slide 20 vs RfTrack
-comparativa_trayectorias("transport_table.txt", s_vector2, y2[0, :], "RK4_vs_RFTrack_S20.png")
+# comparativa_trayectorias("transport_table.txt", s_vector2, y2[0, :], "RK4_vs_RFTrack_S20.png")
 
 
 
@@ -140,10 +143,10 @@ comparativa_trayectorias("transport_table.txt", s_vector2, y2[0, :], "RK4_vs_RFT
 
 # fig = plt.figure(figsize=(10, 3))
 # plt.step(s_plot, k_values_ncells, where='post')
-# plt.title("k(s) — n celdas")
-# plt.xlabel("s")
-# plt.ylabel("k")
-# plt.ylim(min(-1.5, np.min(k_values_ncells) - 0.1), max(1.5, np.max(k_values_ncells) + 0.1))
+# plt.title("k(s) Slide 20, 4 celdas",fontsize=12)
+# plt.xlabel("$s [m]$", fontsize=15)
+# plt.ylabel("$k(s) [m]$", fontsize=15)
+# plt.ylim(min(-0.6, np.min(k_values_ncells) - 0.1), max(0.6, np.max(k_values_ncells) + 0.1))
 # plt.grid(True)
 # plt.tight_layout()
 # save_figure("k(s) Slide 20")
@@ -172,44 +175,48 @@ comparativa_trayectorias("transport_table.txt", s_vector2, y2[0, :], "RK4_vs_RFT
 
 
 
- # #COMPARANDO VS SOL ANALÍTICA, Acelerador de la slide 19 (Thin lens approx., ver 7.3)
+# COMPARANDO VS SOL ANALÍTICA, Acelerador de la slide 19 (Thin lens approx., ver 7.3)
 
-# f = 1/ (p.k_val*p.lq1) # dsitancia focal
-# L= p.Lc /2 # longitud entre quads
+f1 = 2/ (p.k_val*p.lq1) # dsitancia focal de medio quadrupolo focalizador
+f2 = -f1
+L= p.Ld # longitud entre quads
+inv_f_star = (1 / f1) + (1 / f2) - (L / (f1*f2))
 
-# # Matriz de transferencia FODO cell
-# M = np.array([
-#     [1 - (L**2)/(2*f**2), 2*L*  (1+ L/(2*f))],
-#     [-(L/(2*f**2)) * (1 - L/(2*f)),  1- (L**2)/(2*f**2)]
-# ])
+f_star = 1 / inv_f_star
 
-# # se iniciazlian los vectores para guardar los estados al final de cada celda
-# s_discret = np.arange(0, s_end1+ p.Lc, p.Lc)
-# y_thin= np.zeros((2,len( s_discret)))
-# y_thin[:, 0] = y0
+# Matriz de transferencia FODO cell
 
-# # se multiplica la matriz celda a celda 
+M = np.array([
+    [1 - 2*L/f_star, 2*L*  (1- L/f2)],
+    [-2*(1-L/f1)/f_star,  1- 2*L/f_star]
+])
 
-# for i in range(1, len(s_discret)):
-#      y_thin[:, i] = M @ y_thin[:, i-1 ]
+# se iniciazlian los vectores para guardar los estados al final de cada celda
+s_discret = np.arange(0, s_end1+ p.Lc, p.Lc)
+y_thin= np.zeros((2,len( s_discret)))
+y_thin[:, 0] = y0
+
+# se multiplica la matriz celda a celda 
+
+for i in range(1, len(s_discret)):
+     y_thin[:, i] = M @ y_thin[:,i-1 ]
 
 
 
 
-# #PLOT PRAA COMPARAR
-# plt.figure(figsize=(12,5))
+#PLOT PRAA COMPARAR
+plt.figure(figsize=(12,5))
 
-# #esto es la numérica, la del rk4
-# plt.plot(s_vector1, y1[0, :], label='Numérica RK4 (\'Continua\')', color='lightgray', linewidth=2)
+#esto es la numérica, la del rk4
+plt.plot(s_vector1, y1[0, :] *1000, label='Numérica RK4 (\'Continua\')', color='lightgray', linewidth=2)
 
-# # Dibujamos los puntos 'discretos'(por tener un paso mucho más grueso) de la solución teórica
-# plt.plot(s_discret, y_thin[0, :], 'ro', markersize=4, label='Teórica Thin-Lens')
+# Dibujamos los puntos 'discretos'(por tener un paso mucho más grueso) de la solución teórica
+plt.plot(s_discret, y_thin[0, :]*1000, 'ro', markersize=4, label='Teórica Thin-Lens')
 
-# plt.title("Dinámica Transversal: RK4 vs Thin Lens Approxi")
-# plt.xlabel("s(m)")
-# plt.ylabel("x(s)")
-# plt.xlim(0, s_end1) 
-# plt.legend()
-# plt.grid(True)
-# save_figure(filename="RK4 vs Thin Lens Approxi.")
+plt.title("Dinámica Transversal: RK4 vs Thin Lens Approxi")
+plt.xlabel("$s [m]$")
+plt.ylabel("$x(s) [m]$") 
+plt.legend()
+plt.grid(True)
+save_figure(filename="RK4 vs Thin Lens Approxi.")
 

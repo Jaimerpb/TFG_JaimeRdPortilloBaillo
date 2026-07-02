@@ -1,6 +1,5 @@
 import numpy as np 
 
-
 def periodic_s(li, lf , f, s):
     if s >= li and s <= lf:
         return f(s)
@@ -26,7 +25,7 @@ def kquadb(s, p):
     return 0
 
 def kquadp(s, p):
-    # Usamos un lambda para inyectar 'p' en la función base
+    #Usamos un lambda para inyectar 'p' en la función base
     return periodic_s(p.l_i, p.Lc, lambda s_val: kquadb(s_val, p), s)
 
 def kquad(s, p):
@@ -39,21 +38,21 @@ def kquad(s, p):
 def k20b(s, p):
     if s >= p.l_i and s <= (p.l_i + p.lq1/2):
         return p.k_val * (1 - p.delta)
-    elif s > (p.l_i + p.lq1/ 2) and s < (p.Lc2/4 - p.ld/2):
+    elif s > (p.l_i + p.lq1/ 2) and s < (p.l_i + p.lq1/ 2 + p.ld):
         return 0
-    elif s >= (p.Lc2/4 - p.ld/2) and s <= (p.Lc2/4 + p.ld/2):
+    elif s >= (p.l_i + p.lq1/ 2 + p.ld) and s <= (p.l_i + p.lq1/ 2 + p.ld + p.lD):
         return 1 / p.rho**2
-    elif s > (p.Lc2/4 + p.ld/2) and s < (p.Lc2/2 - p.lq1/2):
+    elif s > (p.l_i + p.lq1/ 2 + p.ld + p.lD) and s < (p.l_i + p.lq1/ 2 + p.ld + p.lD + p.ld):
         return 0
-    elif s >= (p.Lc2/2 - p.lq1/2) and s <= (p.Lc2/2 + p.lq1/2):
+    elif s >= (p.l_i + p.lq1/ 2 + 2*p.ld + p.lD) and s <= (p.l_i + p.lq1/ 2 + 2*p.ld + p.lD + p.lq1):
         return -p.k_val * (1 - p.delta)
-    elif s > (p.Lc2/2 + p.lq1/2) and s < (3*p.Lc2/4 - p.ld/2):
+    elif s > (p.l_i + p.lq1/ 2 + 2*p.ld + p.lD + p.lq1) and s < (p.l_i + p.lq1/ 2 + 3*p.ld + p.lD + p.lq1):
         return 0
-    elif s >= (3*p.Lc2/4 - p.ld/2) and s <= (3*p.Lc2/4 + p.ld/2):
+    elif s >= (p.l_i + p.lq1/ 2 + 3*p.ld + p.lD + p.lq1) and s <= (p.l_i + p.lq1/ 2 + 3*p.ld + p.lD + p.lq1 + p.lD):
         return 1 / p.rho**2
-    elif s > (3*p.Lc2/4 + p.ld/2) and s < (p.Lc2 - p.lq1/2):
+    elif s > (p.l_i + p.lq1/ 2 + 3*p.ld + p.lD + p.lq1 + p.lD) and s < (p.l_i + p.lq1/ 2 + 4*p.ld + p.lD + p.lq1 + p.lD):
         return 0
-    elif s >= (p.Lc2 - p.lq1/2) and s <= p.Lc2:
+    elif s >= (p.l_i + p.lq1/ 2 + 4*p.ld + p.lD + p.lq1 + p.lD) and s <= p.Lc2:
         return p.k_val * (1 - p.delta)
     return 0
 
@@ -66,19 +65,15 @@ def k20(s, p):
     return np.array([k20p(si, p) for si in s])
 
 
-# Término inhomogeneo de la ec. de hill
+# Término inhomogeneo de la ec. de hill corregido
 def inhomb(s, p):
-    if s >= p.l_i and s < (p.Lc2/4 - p.ld/2):
-        return 0
-    elif s >= (p.Lc2/4 - p.ld/2) and s <= (p.Lc2/4 + p.ld/2):
+
+    if s >= (p.l_i + p.lq1/ 2 + p.ld) and s <= (p.l_i + p.lq1/ 2 + p.ld + p.lD):
         return p.delta / p.rho
-    elif s > (p.Lc2/4 + p.ld/2) and s < (3*p.Lc2/4 - p.ld/2):
-        return 0
-    elif s >= (3*p.Lc2/4 - p.ld/2) and s <= (3*p.Lc2/4 + p.ld/2):
+    elif s >= (p.l_i + p.lq1/ 2 + 3*p.ld + p.lD + p.lq1) and s <= (p.l_i + p.lq1/ 2 + 3*p.ld + p.lD + p.lq1 + p.lD):
         return p.delta / p.rho
-    elif s > (3*p.Lc2/4 + p.ld/2) and s <= p.Lc2:
+    else:
         return 0
-    return 0
 
 def inhomp(s, p):
     return periodic_s(p.l_i, p.Lc2, lambda s_val: inhomb(s_val, p), s)
