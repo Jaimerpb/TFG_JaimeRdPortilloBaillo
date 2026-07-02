@@ -211,7 +211,7 @@ plt.figure(figsize=(12,5))
 plt.plot(s_vector1, y1[0, :] *1000, label='Numérica RK4 (\'Continua\')', color='lightgray', linewidth=2)
 
 # Dibujamos los puntos 'discretos'(por tener un paso mucho más grueso) de la solución teórica
-plt.plot(s_discret, y_thin[0, :]*1000, 'ro', markersize=4, label='Teórica Thin-Lens')
+plt.plot(s_discret, y_thin[0, :]*1000,'.-' , 'ro', markersize=4, label='Teórica Thin-Lens')
 
 plt.title("Dinámica Transversal: RK4 vs Thin Lens Approxi")
 plt.xlabel("$s [m]$")
